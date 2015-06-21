@@ -89,8 +89,8 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
   for(int i=0; i<3; i++) {
     m_kf[i].setP(0,0,0,0);
     m_kf[i].setQ(0.001*m_dt, 0, 0, 0.003*m_dt);
-    m_kf[i].setR(0.3);
-    //m_kf[i].setR(0.03);
+    //m_kf[i].setR(0.3);
+    m_kf[i].setR(0.03);
     m_kf[i].setA(1, -m_dt, 0, 1);
     m_kf[i].setB(m_dt, 0);
   }
