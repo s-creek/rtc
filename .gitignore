@@ -1,5 +1,6 @@
 *~
 log/
+script/
 
 # c++
 *.o
@@ -13,3 +14,10 @@ cmake_install.cmake
 install_manifest.txt
 CMakeFiles
 
+
+bin/
+python/
+src/
+
+*.hh
+*.cc

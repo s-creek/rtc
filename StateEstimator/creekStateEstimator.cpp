@@ -30,7 +30,7 @@ static const char* module_spec[] =
     "type_name",         "creekStateEstimator",
     "description",       "Sequence InPort component",
     "version",           "1.0",
-    "vendor",            "ogawa",
+    "vendor",            "s-creek",
     "category",          "example",
     "activity_type",     "SPORADIC",
     "kind",              "SequenceInComponent",
@@ -100,6 +100,12 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
 }
 
 
+RTC::ReturnCode_t creekStateEstimator::onActivated(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+
+
 RTC::ReturnCode_t creekStateEstimator::onExecute(RTC::UniqueId ec_id)
 {
   if( m_accSensorIn.isNew() )   m_accSensorIn.read();
@@ -149,8 +155,6 @@ RTC::ReturnCode_t creekStateEstimator::onExecute(RTC::UniqueId ec_id)
     m_rpy.data[i] = m_kf[i].filtering(rpy(i), m_gyroSensor.data[i]);
   }
   m_rpyOut.write();
-
-
   return RTC::RTC_OK;
 }
 

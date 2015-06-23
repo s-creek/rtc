@@ -10,7 +10,7 @@ static const char* module_spec[] =
     "type_name",         "creekPdServo",
     "description",       "Sequence InPort component",
     "version",           "1.0",
-    "vendor",            "ogawa",
+    "vendor",            "s-creek",
     "category",          "example",
     "activity_type",     "SPORADIC",
     "kind",              "SequenceInComponent",
@@ -85,16 +85,10 @@ RTC::ReturnCode_t creekPdServo::onInitialize()
     std::cout << m_instanceName << " : p gain =";  for( int i = 0; i < m_dof; i++)  std::cout << "  " << m_pGain[i];  std::cout << std::endl;
     std::cout << m_instanceName << " : d gain =";  for( int i = 0; i < m_dof; i++)  std::cout << "  " << m_dGain[i];  std::cout << std::endl;
 
-    m_qPre.resize(m_dof);
-    m_qRefPre.resize(m_dof);
-    for( int i = 0; i < m_dof; i++) {
-      m_qPre[i] = 0.0;
-      m_qRefPre[i] = 0.0;
-    }
-
-    m_isInit = false;
   }
 
+  m_qPre.resize(m_dof);
+  m_qRefPre.resize(m_dof);
 
   m_qCur.data.length(m_dof);
   m_qRef.data.length(m_dof);
@@ -104,30 +98,32 @@ RTC::ReturnCode_t creekPdServo::onInitialize()
   return RTC::RTC_OK;
 }
 
-
-RTC::ReturnCode_t creekPdServo::onExecute(RTC::UniqueId ec_id)
+RTC::ReturnCode_t creekPdServo::onActivated(RTC::UniqueId ec_id)
 {
+  std::cout << m_instanceName << " : onActivated" << std::endl;
+
   //
   // set initial data
   //
-  if( !m_isInit ) {
-    if( m_qCurIn.isNew() ) {
-      m_qCurIn.read();
+  if( m_qCurIn.isNew() ) {
+    m_qCurIn.read();
 
-      if( !m_isInit ) {
-	for(int i = 0; i < m_dof; i++) {
-	  m_qPre[i]      = m_qCur.data[i];
-	  m_qRefPre[i]   = m_qCur.data[i];
-	  m_qRef.data[i] = m_qCur.data[i];
-	}
-	m_isInit = true;
-      }
+    for(int i = 0; i < m_dof; i++) {
+      m_qPre[i]      = m_qCur.data[i];
+      m_qRefPre[i]   = m_qCur.data[i];
+      m_qRef.data[i] = m_qCur.data[i];   
     }
-    else
-      return RTC::RTC_OK;  
   }
-    
+  else {
+    std::cout << m_instanceName << " : connection error" << std::endl;
+    return RTC::RTC_ERROR;
+  }
 
+  return RTC::RTC_OK;
+}
+
+RTC::ReturnCode_t creekPdServo::onExecute(RTC::UniqueId ec_id)
+{
   if( m_qCurIn.isNew() )  m_qCurIn.read();
   if( m_qRefIn.isNew() )  m_qRefIn.read();
   
@@ -141,10 +137,6 @@ RTC::ReturnCode_t creekPdServo::onExecute(RTC::UniqueId ec_id)
 
     m_qPre[i]    = m_qCur.data[i];
     m_qRefPre[i] = m_qRef.data[i];
-
-    if( i == 4 ) {
-      std::cout << m_tauRef.data[i] << "\t" << qCur << "\t" << qRef << "\t" << vCur << "\t" << vRef << std::endl;
-    }
   }
 
   m_tauRefOut.write();

@@ -18,6 +18,7 @@ public:
   //~creekPdServo();
 
   virtual RTC::ReturnCode_t onInitialize();
+  virtual RTC::ReturnCode_t onActivated(RTC::UniqueId ec_id);
   virtual RTC::ReturnCode_t onExecute(RTC::UniqueId ec_id);
 
 
