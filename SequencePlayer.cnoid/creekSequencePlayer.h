@@ -17,7 +17,7 @@
 #include <cnoid/Body>
 #include "VectorConvert.h"
 
-#include <creekInterpolator/QueueInterpolator.h>
+#include <creekInterpolator/Interpolator.h>
 
 using namespace RTC;
 
@@ -42,9 +42,22 @@ public:
   bool isEmpty();
 
 protected:
+  //
+  // InPort
+  //
   TimedDoubleSeq m_qInit;
   InPort<TimedDoubleSeq> m_qInitIn;
+  TimedPoint3D m_basePosInit;
+  InPort<TimedPoint3D> m_basePosInitIn;
+  TimedOrientation3D m_baseRpyInit;
+  InPort<TimedOrientation3D> m_baseRpyInitIn;
+  TimedPoint3D m_zmpRefInit;
+  InPort<TimedPoint3D> m_zmpRefInitIn;
 
+
+  //
+  // OutPort
+  //
   TimedDoubleSeq m_qRef;
   OutPort<TimedDoubleSeq> m_qRefOut;
   TimedPoint3D m_basePos;
@@ -54,6 +67,10 @@ protected:
   TimedPoint3D m_zmpRef;
   OutPort<TimedPoint3D> m_zmpRefOut;
 
+
+  //
+  // ServicePort
+  //
   RTC::CorbaPort m_creekSequencePlayerServicePort;
   creekSequencePlayerService_impl m_service0;
 
@@ -64,7 +81,7 @@ private:
   cnoid::BodyPtr m_robot;
 
   enum {ANGLES, POS, RPY, ZMP, NUM_SEQ};
-  creek::QueueInterpolator *m_seq[NUM_SEQ];
+  creek::Interpolator *m_seq[NUM_SEQ];
 
   bool m_waitFlag;
   boost::interprocess::interprocess_semaphore m_waitSem;

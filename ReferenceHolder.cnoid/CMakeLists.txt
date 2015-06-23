@@ -6,7 +6,7 @@ if (NOT CMAKE_MODULE_PATH)
 endif (NOT CMAKE_MODULE_PATH)
 
 ####
-## settings for OpenRTM and Choreonoid
+## settings for OpenRTM
 ##
 include(FindPkgConfig)
 include(CheckIncludeFiles)
@@ -28,10 +28,8 @@ include_directories(${CHOREONOID_INCLUDE_DIRS})
 link_directories(${CHOREONOID_LIBRARY_DIRS})
 
 
-set(CREEK_PATH $ENV{HOME}/workspace/git/creeklib)
-include_directories(${CREEK_PATH})
 include_directories(${CMAKE_MODULE_PATH})
-
+include(GenerateStubSkel)
 
 ####
 ## for each component
@@ -39,18 +37,15 @@ include_directories(${CMAKE_MODULE_PATH})
 set(comp_name ${COMP_NAME})
 set(comp_sources ${comp_name}.cpp)
 
-generate_stub_skel(${comp_name}Service)
-set(comp_sources ${comp_sources} ${comp_name}Service_impl.cpp ${comp_name}ServiceSk.cpp)
+#generate_stub_skel(${comp_name}Service)
+#set(comp_sources ${comp_sources} ${comp_name}Service_impl.cpp ${comp_name}ServiceSk.cpp)
 
-set(comp_sources ${comp_sources} ${CREEK_PATH}/creekInterpolator/InterpolatorBase.cpp)
-set(comp_sources ${comp_sources} ${CREEK_PATH}/creekInterpolator/Interpolator.cpp)
 
 add_library(${comp_name} SHARED ${comp_sources})
 target_link_libraries(${comp_name} ${OPENRTM_LIBRARIES})
 target_link_libraries(${comp_name} ${CHOREONOID_LIBRARIES})
 target_link_libraries(${comp_name} lapack blas f2c m)
 set_target_properties(${comp_name} PROPERTIES PREFIX "")
-set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS BOOST_DISABLE_ASSERTS)
 
 if (NO_COMP)
   set(target ${comp_name})

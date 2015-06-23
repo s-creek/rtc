@@ -27,6 +27,9 @@ static const char* creeksequenceplayer_spec[] =
 creekSequencePlayer::creekSequencePlayer(RTC::Manager* manager)
   : RTC::DataFlowComponentBase(manager),
     m_qInitIn("qInit", m_qInit),
+    m_basePosInitIn("basePosInit", m_basePosInit),
+    m_baseRpyInitIn("baseRpyInit", m_baseRpyInit),
+    m_zmpRefInitIn("zmpRefInit", m_zmpRefInit),
     m_qRefOut("qRef", m_qRef),
     m_basePosOut("basePos", m_basePos),
     m_baseRpyOut("baseRpy", m_baseRpy),
@@ -47,6 +50,9 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
 {
   // Set InPort buffers
   addInPort("qInit", m_qInitIn);
+  addInPort("basePosInit", m_basePosInitIn);
+  addInPort("baseRpyInit", m_baseRpyInitIn);
+  addInPort("zmpRefInit", m_zmpRefInitIn);
 
   // Set OutPort buffer
   addOutPort("qRef", m_qRefOut);
@@ -55,9 +61,8 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
   addOutPort("zmpRef", m_zmpRefOut);
 
   // Set service provider to Ports
-  m_creekSequencePlayerServicePort.registerProvider("service0", "creekSequencePlayerService", m_service0);
-
   // Set CORBA Service Ports
+  m_creekSequencePlayerServicePort.registerProvider("service0", "creekSequencePlayerService", m_service0);
   addPort(m_creekSequencePlayerServicePort);
 
 
@@ -79,9 +84,9 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
   //
   // init interpolator
   //
-  m_seq[ANGLES] = new creek::QueueInterpolator(m_dof, m_dt, creek::CUBIC);
+  m_seq[ANGLES] = new creek::Interpolator(m_dof, m_dt, creek::CUBIC);
   for(int i=POS; i<NUM_SEQ; i++)
-    m_seq[i] = new creek::QueueInterpolator(3, m_dt, creek::CUBIC);
+    m_seq[i] = new creek::Interpolator(3, m_dt, creek::CUBIC);
 
 
   //
@@ -97,9 +102,12 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
 
 RTC::ReturnCode_t creekSequencePlayer::onActivated(RTC::UniqueId ec_id)
 {
-  if( m_qInitIn.isNew() ) m_qInitIn.read();
+  if( m_qInitIn.isNew() )       m_qInitIn.read();
+  if( m_basePosInitIn.isNew() ) m_basePosInitIn.read();
+  if( m_baseRpyInitIn.isNew() ) m_baseRpyInitIn.read();
+  if( m_zmpRefInitIn.isNew() )  m_zmpRefInitIn.read();
 
-
+  /*
   //
   // init model
   //
@@ -109,8 +117,9 @@ RTC::ReturnCode_t creekSequencePlayer::onActivated(RTC::UniqueId ec_id)
   coil::stringTo(tmp, prop["initBasePos"].c_str());
   m_robot->rootLink()->p() << tmp[0], tmp[1], tmp[2];
 
+  tmp.clear();
   coil::stringTo(tmp, prop["initBaseRpy"].c_str());
-  m_robot->rootLink()->R() = cnoid::rotFromRpy(tmp[3], tmp[4], tmp[5]);
+  m_robot->rootLink()->R() = cnoid::rotFromRpy(tmp[0], tmp[1], tmp[2]);
   
   for(unsigned int i=0; i<m_dof; i++) m_robot->joint(i)->q() = m_qInit.data[i];
   m_robot->calcForwardKinematics();
@@ -128,7 +137,7 @@ RTC::ReturnCode_t creekSequencePlayer::onActivated(RTC::UniqueId ec_id)
   zmp(2) = 0.0;
   cnoid::Vector3 zmpWaist( m_robot->rootLink()->R().transpose() * (zmp-m_robot->rootLink()->p()) );
   m_seq[ZMP]->set(zmpWaist.data());
-
+  */
 
 
   if( isEmpty() && m_waitFlag ) {
@@ -143,7 +152,10 @@ RTC::ReturnCode_t creekSequencePlayer::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t creekSequencePlayer::onExecute(RTC::UniqueId ec_id)
 {
-  if( m_qInitIn.isNew() ) m_qInitIn.read();
+  if( m_qInitIn.isNew() )       m_qInitIn.read();
+  if( m_basePosInitIn.isNew() ) m_basePosInitIn.read();
+  if( m_baseRpyInitIn.isNew() ) m_baseRpyInitIn.read();
+  if( m_zmpRefInitIn.isNew() )  m_zmpRefInitIn.read();
 
 
   if( isEmpty() && m_waitFlag ) {
@@ -204,9 +216,7 @@ bool creekSequencePlayer::setJointAngles(const double *angles, double tm)
   if( m_qInit.data.length() != m_dof ) return false;
 
   if( m_seq[ANGLES]->empty() ) {
-    m_seq[ANGLES]->clear();
-    m_seq[ANGLES]->set(m_qInit.data.get_buffer());
-    return m_seq[ANGLES]->set(angles, tm);
+    return m_seq[ANGLES]->calcInterpolation(m_qInit.data.get_buffer(), angles, tm);
   }
   else
     return false;
@@ -224,9 +234,7 @@ bool creekSequencePlayer::setJointAngle(const char* jname, double jv, double tm)
       std::memcpy(&angles[0], m_qInit.data.get_buffer(), m_dof*sizeof(double));
       angles[link->jointId()] = jv;
 
-      m_seq[ANGLES]->clear();
-      m_seq[ANGLES]->set(m_qInit.data.get_buffer());
-      return m_seq[ANGLES]->set(angles, tm);
+      return m_seq[ANGLES]->calcInterpolation(m_qInit.data.get_buffer(), angles, tm);
     }
   }
   else
@@ -238,8 +246,11 @@ bool creekSequencePlayer::setBasePos(const double *pos, double tm)
 {
   if( !m_seq[POS]->empty() ) 
     return false;
-  else
-    return m_seq[POS]->set(pos, tm);
+  else {
+    cnoid::Vector3 posInit(m_basePosInit.data.x, m_basePosInit.data.y, m_basePosInit.data.z);
+    std::cout << "creekSequencePlayer : init pos = " << posInit[0] << ", " << posInit[1] << ", " << posInit[2] << std::endl;
+    return m_seq[POS]->calcInterpolation(posInit.data(), pos, tm);
+  }
 }
 
 
@@ -247,8 +258,11 @@ bool creekSequencePlayer::setBaseRpy(const double *rpy, double tm)
 {
   if( !m_seq[RPY]->empty() ) 
     return false;
-  else
-    return m_seq[RPY]->set(rpy, tm);
+  else {
+    cnoid::Vector3 rpyInit(m_baseRpyInit.data.r, m_baseRpyInit.data.p, m_baseRpyInit.data.y);
+    std::cout << "creekSequencePlayer : init rpy = " << rpyInit[0] << ", " << rpyInit[1] << ", " << rpyInit[2] << std::endl;
+    return m_seq[RPY]->calcInterpolation(rpyInit.data(), rpy, tm);
+  }
 }
 
 
@@ -256,8 +270,11 @@ bool creekSequencePlayer::setZmp(const double *zmp, double tm)
 {
   if( !m_seq[ZMP]->empty() ) 
     return false;
-  else
-    return m_seq[ZMP]->set(zmp, tm);
+  else {
+    cnoid::Vector3 zmpInit(m_zmpRefInit.data.x, m_zmpRefInit.data.y, m_zmpRefInit.data.z);
+    std::cout << "creekSequencePlayer : init zmp = " << zmpInit[0] << ", " << zmpInit[1] << ", " << zmpInit[2] << std::endl;
+    return m_seq[ZMP]->calcInterpolation(zmpInit.data(), zmp, tm);
+  }
 }
 
 
