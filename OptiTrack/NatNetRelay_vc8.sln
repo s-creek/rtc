@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NatNetRelayComp", "NatNetRelayComp_vc8.vcproj", "{33BF8D0F-5B11-11E3-81A4-1078D2D35CC1}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NatNetRelay", "NatNetRelay_vc8.vcproj", "{33CAD7B0-5B11-11E3-8FE1-1078D2D35CC1}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Win32 = Release|Win32
+		Debug|Win32 = Debug|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{33BF8D0F-5B11-11E3-81A4-1078D2D35CC1}.Release|Win32.ActiveCfg = Release|Win32
+		{33BF8D0F-5B11-11E3-81A4-1078D2D35CC1}.Release|Win32.Build.0   = Release|Win32
+		{33BF8D0F-5B11-11E3-81A4-1078D2D35CC1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{33BF8D0F-5B11-11E3-81A4-1078D2D35CC1}.Debug|Win32.Build.0   = Debug|Win32
+		{33CAD7B0-5B11-11E3-8FE1-1078D2D35CC1}.Release|Win32.ActiveCfg = Release|Win32
+		{33CAD7B0-5B11-11E3-8FE1-1078D2D35CC1}.Release|Win32.Build.0   = Release|Win32
+		{33CAD7B0-5B11-11E3-8FE1-1078D2D35CC1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{33CAD7B0-5B11-11E3-8FE1-1078D2D35CC1}.Debug|Win32.Build.0   = Debug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

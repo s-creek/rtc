@@ -1,0 +1,7 @@
+/components
+/NatNetRelayComp
+
+*.bat
+*.log
+*.suo
+*.user
