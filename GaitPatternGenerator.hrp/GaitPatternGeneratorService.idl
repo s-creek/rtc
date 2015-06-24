@@ -1,0 +1,9 @@
+// -*- mode: idl; indent-tabs-mode: t; tab-width: 4; c-basic-offset: 4; -*-
+
+module OpenHRP {
+	interface GaitPatternGeneratorService
+	{
+		void setTargetPos(in double x, in double y, in double th, in double time);
+		void stop();
+	};
+};

@@ -1,0 +1,11 @@
+// -*- mode: idl; indent-tabs-mode: t; tab-width: 4; c-basic-offset: 4; -*-
+
+module OpenHRP {
+  interface ArmControlCartesianService
+  {
+    boolean isEmpty();
+    boolean setTargetAngular(in double x, in double y, in double z, in double r, in double p, in double w, in double time);
+    void getCurrentConfiguration(out double x, out double y, out double z, out double r, out double p, out double w);
+    void emergencyStop();
+  };
+};
