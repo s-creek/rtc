@@ -2,7 +2,7 @@
 #include "VectorConvert.h"
 
 #include <rtm/CorbaNaming.h>
-
+std::ofstream ofsCur, ofsRef, ofsVel;
 // Module specification
 static const char* module_spec[] =
   {
@@ -33,7 +33,7 @@ creekPdServo::creekPdServo(RTC::Manager * manager)
 
 RTC::ReturnCode_t creekPdServo::onInitialize()
 {
-//
+  //
   // Registration: InPort/OutPort/Service
   //
   // Set InPort buffers
@@ -94,12 +94,16 @@ RTC::ReturnCode_t creekPdServo::onInitialize()
   m_qRef.data.length(m_dof);
   m_tauRef.data.length(m_dof);
 
-
+  m_rate=1.0;
+  coil::stringTo(m_rate, prop["pdservo.rate"].c_str());
+  std::cout << m_instanceName << " : rate = " << m_rate << std::endl;
   return RTC::RTC_OK;
 }
 
+double tcount(0.0);
 RTC::ReturnCode_t creekPdServo::onActivated(RTC::UniqueId ec_id)
 {
+  tcount = 0.0;
   std::cout << m_instanceName << " : onActivated" << std::endl;
 
   //
@@ -111,19 +115,27 @@ RTC::ReturnCode_t creekPdServo::onActivated(RTC::UniqueId ec_id)
     for(int i = 0; i < m_dof; i++) {
       m_qPre[i]      = m_qCur.data[i];
       m_qRefPre[i]   = m_qCur.data[i];
-      m_qRef.data[i] = m_qCur.data[i];   
+      m_qRef.data[i] = m_qCur.data[i];
     }
+    std::cout << "servo : q0 = " << m_qCur.data[0] << std::endl;
   }
   else {
     std::cout << m_instanceName << " : connection error" << std::endl;
     return RTC::RTC_ERROR;
   }
 
+  ofsCur.open("/home/ogawa/workspace/git/rtc/bin/logCur.dat");
+  ofsRef.open("/home/ogawa/workspace/git/rtc/bin/logRef.dat");
+  ofsVel.open("/home/ogawa/workspace/git/rtc/bin/logVel.dat");
   return RTC::RTC_OK;
 }
 
+
 RTC::ReturnCode_t creekPdServo::onExecute(RTC::UniqueId ec_id)
 {
+  tcount+=m_dt;
+  //std::cout << "servo : time = " << tcount << std::endl;
+
   if( m_qCurIn.isNew() )  m_qCurIn.read();
   if( m_qRefIn.isNew() )  m_qRefIn.read();
   
@@ -133,11 +145,18 @@ RTC::ReturnCode_t creekPdServo::onExecute(RTC::UniqueId ec_id)
     double vCur = (qCur - m_qPre[i]) / m_dt;
     double vRef = (qRef - m_qRefPre[i]) / m_dt;
 
-    m_tauRef.data[i] = m_pGain[i] * (qRef - qCur) + m_dGain[i] * (vRef - vCur);
+    m_tauRef.data[i] = m_rate * (m_pGain[i] * (qRef - qCur) + m_dGain[i] * (vRef - vCur));
 
     m_qPre[i]    = m_qCur.data[i];
     m_qRefPre[i] = m_qRef.data[i];
+
+    ofsCur << " " << m_qCur.data[i];
+    ofsRef << " " << m_qRef.data[i];
+    ofsVel << " " << (qRef - qCur);
   }
+  ofsCur << std::endl;
+  ofsRef << std::endl;
+  ofsVel << std::endl;
 
   m_tauRefOut.write();
   return RTC::RTC_OK;

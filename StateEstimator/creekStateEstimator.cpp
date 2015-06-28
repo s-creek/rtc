@@ -4,10 +4,16 @@
 #include "creekStateEstimator.h"
 
 // tvmet (from OpenHRP)
-#include <tvmet/Matrix.h>
-#include <tvmet/Vector.h>
-typedef tvmet::Matrix<double, 3, 3> Matrix33;
-typedef tvmet::Vector<double, 3> Vector3;
+//#include <tvmet/Matrix.h>
+//#include <tvmet/Vector.h>
+//typedef tvmet::Matrix<double, 3, 3> Matrix33;
+//typedef tvmet::Vector<double, 3> Vector3;
+
+using Eigen::Matrix3d;
+using Eigen::Vector3d;
+typedef Eigen::Matrix3d Matrix33;
+typedef Eigen::Vector3d Vector3;
+
 void calcRotFromRpy(Matrix33& out_R, double r, double p, double y)
 {
     const double cr = cos(r), sr = sin(r), cp = cos(p), sp = sin(p), cy = cos(y), sy = sin(y);
@@ -54,6 +60,8 @@ creekStateEstimator::creekStateEstimator(RTC::Manager * manager)
 
 RTC::ReturnCode_t creekStateEstimator::onInitialize()
 {
+  std::cout << "creekStateEstimator : onInitialize" << std::endl;
+
   //
   // set port
   //
@@ -66,14 +74,15 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
   m_accSensor.data.length(3);
   m_gyroSensor.data.length(3);
   m_accRef.data.length(3);
-  m_rpy.data.length(3);
+  //m_rpy.data.length(3);
 
   for(int i=0; i<3; i++) {
     m_accSensor.data[i]  = 0.0;
     m_gyroSensor.data[i] = 0.0;
     m_accRef.data[i]     = 0.0;
-    m_rpy.data[i]        = 0.0;
+    //m_rpy.data[i]        = 0.0;
   }
+  m_rpy.data.r=0.0;  m_rpy.data.p=0.0;  m_rpy.data.y=0.0;
 
 
   //
@@ -102,6 +111,8 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
 
 RTC::ReturnCode_t creekStateEstimator::onActivated(RTC::UniqueId ec_id)
 {
+  std::cout << "creekStateEstimator : onActivated" << std::endl;
+
   return RTC::RTC_OK;
 }
 
@@ -126,14 +137,16 @@ RTC::ReturnCode_t creekStateEstimator::onExecute(RTC::UniqueId ec_id)
   for(int i=0; i<3; i++) {
     gacc(i) = m_accSensor.data[i] - m_accRef.data[i];
   }
-  double g = tvmet::norm2(gacc);
+  //double g = tvmet::norm2(gacc);
+  double g = gacc.norm();
 
 
   //
   // gyro (on world)
   //
   Matrix33 rot; //( rotFromRpy(m_rpy.data[0], m_rpy.data[1], m_rpy.data[2]) );
-  calcRotFromRpy( rot, m_rpy.data[0], m_rpy.data[1], m_rpy.data[2] );
+  //calcRotFromRpy( rot, m_rpy.data[0], m_rpy.data[1], m_rpy.data[2] );
+  calcRotFromRpy( rot, m_rpy.data.r, m_rpy.data.p, m_rpy.data.y );
   Vector3 gyro( rot * Vector3(m_gyroSensor.data[0], m_gyroSensor.data[1], m_gyroSensor.data[2]) );
 
 
@@ -142,18 +155,30 @@ RTC::ReturnCode_t creekStateEstimator::onExecute(RTC::UniqueId ec_id)
   // ay = cos(p) * sin(r) * g
   // az = cos(p) * cos(r) * g
   //
-  Vector3 rpy(0);
+  Vector3 rpy;
   rpy(1) = atan2(-gacc(0), sqrt(gacc(1)*gacc(1) + gacc(2)*gacc(2)));  // p : -90～90 [deg]  ->  cos(p) >= 0
   rpy(0) = atan2(gacc(1), gacc(2));
-  rpy(2) = m_rpy.data[2] + m_dt*gyro(2);
+  //rpy(2) = m_rpy.data[2] + m_dt*gyro(2);
+  rpy(2) = m_rpy.data.y + m_dt*gyro(2);
   
 
   //
   // update
   //
-  for(int i=0; i<3; i++) {
-    m_rpy.data[i] = m_kf[i].filtering(rpy(i), m_gyroSensor.data[i]);
-  }
+  //for(int i=0; i<3; i++)  m_rpy.data[i] = m_kf[i].filtering(rpy(i), m_gyroSensor.data[i]);
+  m_rpy.data.r = m_kf[0].filtering(rpy(0), m_gyroSensor.data[0]);
+  m_rpy.data.p = m_kf[1].filtering(rpy(1), m_gyroSensor.data[1]);
+  m_rpy.data.y = m_kf[2].filtering(rpy(2), m_gyroSensor.data[2]);
+
+
+  /*
+  // debug
+  rpy << m_rpy.data.r, m_rpy.data.p, m_rpy.data.y;
+  Vector3 rpyDeg;
+  rpyDeg = rpy / M_PI * 180.0;
+  std::cout << "kf : " << rpyDeg(0) << ", " << rpyDeg(1) << ", " << rpyDeg(2) << std::endl;
+  */
+
   m_rpyOut.write();
   return RTC::RTC_OK;
 }

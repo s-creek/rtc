@@ -3,13 +3,19 @@
 #ifndef CREEK_KALMAN_FILTER_H
 #define CREEK_KALMAN_FILTER_H
 
-#include <tvmet/Matrix.h>
-#include <tvmet/Vector.h>
+//#include <tvmet/Matrix.h>
+//#include <tvmet/Vector.h>
+#include <Eigen/Core>
 
 namespace creek
 {
-  typedef tvmet::Matrix<double, 2, 2> tmatrix;
-  typedef tvmet::Vector<double, 2> tvector;
+  //typedef tvmet::Matrix<double, 2, 2> tmatrix;
+  //typedef tvmet::Vector<double, 2> tvector;
+
+  using Eigen::Matrix2d;
+  using Eigen::Vector2d;
+  typedef Eigen::Matrix2d tmatrix;
+  typedef Eigen::Vector2d tvector;
 };
 
 

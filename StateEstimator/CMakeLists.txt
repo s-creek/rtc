@@ -17,6 +17,12 @@ link_directories(${OPENRTM_LIBRARY_DIRS})
 include_directories(${CMAKE_MODULE_PATH})
 include(GenerateStubSkel)
 
+###
+# add eigen3
+#
+pkg_check_modules(EIGEN3 REQUIRED eigen3)
+include_directories(${EIGEN3_INCLUDE_DIRS})
+
 ####
 ## for each component
 ##

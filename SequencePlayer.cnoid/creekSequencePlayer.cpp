@@ -5,7 +5,7 @@
 #include <cnoid/BodyLoader>
 #include <cnoid/Link>
 #include <cnoid/EigenUtil>
-
+double tcount(0.0);
 static const char* creeksequenceplayer_spec[] =
   {
     "implementation_id", "creekSequencePlayer",
@@ -48,6 +48,8 @@ creekSequencePlayer::~creekSequencePlayer()
 
 RTC::ReturnCode_t creekSequencePlayer::onInitialize()
 {
+  std::cout << "creekSequencePlayer : onInitialize" << std::endl;
+
   // Set InPort buffers
   addInPort("qInit", m_qInitIn);
   addInPort("basePosInit", m_basePosInitIn);
@@ -102,11 +104,13 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
 
 RTC::ReturnCode_t creekSequencePlayer::onActivated(RTC::UniqueId ec_id)
 {
+  std::cout << "creekSequencePlayer : onActivated" << std::endl;
+
   if( m_qInitIn.isNew() )       m_qInitIn.read();
   if( m_basePosInitIn.isNew() ) m_basePosInitIn.read();
   if( m_baseRpyInitIn.isNew() ) m_baseRpyInitIn.read();
   if( m_zmpRefInitIn.isNew() )  m_zmpRefInitIn.read();
-
+  
   /*
   //
   // init model
@@ -145,13 +149,16 @@ RTC::ReturnCode_t creekSequencePlayer::onActivated(RTC::UniqueId ec_id)
     m_waitSem.post();
   }
 
-
+  tcount = 0.0;
   return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t creekSequencePlayer::onExecute(RTC::UniqueId ec_id)
 {
+  tcount+=m_dt;
+  //std::cout << "seq : time = " << tcount << std::endl;
+
   if( m_qInitIn.isNew() )       m_qInitIn.read();
   if( m_basePosInitIn.isNew() ) m_basePosInitIn.read();
   if( m_baseRpyInitIn.isNew() ) m_baseRpyInitIn.read();
@@ -248,7 +255,7 @@ bool creekSequencePlayer::setBasePos(const double *pos, double tm)
     return false;
   else {
     cnoid::Vector3 posInit(m_basePosInit.data.x, m_basePosInit.data.y, m_basePosInit.data.z);
-    std::cout << "creekSequencePlayer : init pos = " << posInit[0] << ", " << posInit[1] << ", " << posInit[2] << std::endl;
+    //std::cout << "creekSequencePlayer : init pos = " << posInit[0] << ", " << posInit[1] << ", " << posInit[2] << std::endl;
     return m_seq[POS]->calcInterpolation(posInit.data(), pos, tm);
   }
 }
@@ -260,7 +267,7 @@ bool creekSequencePlayer::setBaseRpy(const double *rpy, double tm)
     return false;
   else {
     cnoid::Vector3 rpyInit(m_baseRpyInit.data.r, m_baseRpyInit.data.p, m_baseRpyInit.data.y);
-    std::cout << "creekSequencePlayer : init rpy = " << rpyInit[0] << ", " << rpyInit[1] << ", " << rpyInit[2] << std::endl;
+    //std::cout << "creekSequencePlayer : init rpy = " << rpyInit[0] << ", " << rpyInit[1] << ", " << rpyInit[2] << std::endl;
     return m_seq[RPY]->calcInterpolation(rpyInit.data(), rpy, tm);
   }
 }
@@ -272,7 +279,7 @@ bool creekSequencePlayer::setZmp(const double *zmp, double tm)
     return false;
   else {
     cnoid::Vector3 zmpInit(m_zmpRefInit.data.x, m_zmpRefInit.data.y, m_zmpRefInit.data.z);
-    std::cout << "creekSequencePlayer : init zmp = " << zmpInit[0] << ", " << zmpInit[1] << ", " << zmpInit[2] << std::endl;
+    //std::cout << "creekSequencePlayer : init zmp = " << zmpInit[0] << ", " << zmpInit[1] << ", " << zmpInit[2] << std::endl;
     return m_seq[ZMP]->calcInterpolation(zmpInit.data(), zmp, tm);
   }
 }
@@ -282,7 +289,6 @@ bool creekSequencePlayer::isEmpty()
 {
   for(int i=0; i<NUM_SEQ; i++)
     if( !m_seq[i]->empty() ) return false;
-
   return true;
 }
 

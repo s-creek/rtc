@@ -5,6 +5,7 @@
 
 // rtm
 #include <rtm/idl/BasicDataTypeSkel.h>
+#include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>
 #include <rtm/CorbaPort.h>
@@ -36,8 +37,10 @@ protected:
 
 
   // outport
-  RTC::TimedDoubleSeq m_rpy;
-  RTC::OutPort<RTC::TimedDoubleSeq> m_rpyOut;
+  //RTC::TimedDoubleSeq m_rpy;
+  //RTC::OutPort<RTC::TimedDoubleSeq> m_rpyOut;
+  RTC::TimedOrientation3D m_rpy;
+  RTC::OutPort<RTC::TimedOrientation3D> m_rpyOut;
 
 
 private:

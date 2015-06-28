@@ -46,6 +46,8 @@ creekReferenceHolder::~creekReferenceHolder()
 
 RTC::ReturnCode_t creekReferenceHolder::onInitialize()
 {
+  std::cout << "creekReferenceHolder : onInitialize" << std::endl;
+
   addInPort("qCur", m_qCurIn);
 
   addInPort ("qIn",  m_qIn);
@@ -112,7 +114,7 @@ RTC::ReturnCode_t creekReferenceHolder::onInitialize()
   std::cout << "creekReferenceHolder : init data\n"
 	    << "    base pos = " << m_basePos.data.x << ", " << m_basePos.data.y << ", " << m_basePos.data.z << "\n"
 	    << "    base rpy = " << m_baseRpy.data.r << ", " << m_baseRpy.data.p << ", " << m_baseRpy.data.y << "\n"
-	    << "    zmp pos  = " << m_zmpRef.data.x  << ", " << m_zmpRef.data.y  << ", " << m_zmpRef.data.z << "\n";
+	    << "    zmp pos  = " << m_zmpRef.data.x  << ", " << m_zmpRef.data.y  << ", " << m_zmpRef.data.z  << "\n";
 
 
   return RTC::RTC_OK;
@@ -121,8 +123,11 @@ RTC::ReturnCode_t creekReferenceHolder::onInitialize()
 
 RTC::ReturnCode_t creekReferenceHolder::onActivated(RTC::UniqueId ec_id)
 {
+  std::cout << "creekReferenceHolder : onActivated" << std::endl;
+
   if( m_qCurIn.isNew() ) {
     m_qCurIn.read();
+    std::cout << "holder : q0 = " << m_qCur.data[0] << std::endl;
     unsigned int dof = m_robot->numJoints();
     memcpy(m_q.data.get_buffer(), m_qCur.data.get_buffer(), sizeof(double)*dof );
   }
@@ -137,7 +142,7 @@ RTC::ReturnCode_t creekReferenceHolder::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t creekReferenceHolder::onExecute(RTC::UniqueId ec_id)
 {
   if( m_qCurIn.isNew() ) m_qCurIn.read();
-
+  
   if( m_qIn.isNew() )       m_qIn.read();
   if( m_basePosIn.isNew() ) m_basePosIn.read();
   if( m_baseRpyIn.isNew() ) m_baseRpyIn.read();

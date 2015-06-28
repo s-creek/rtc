@@ -33,7 +33,8 @@ double KalmanFilter::filtering(double y, double u)
   m_x = m_A * m_x + m_B * u;
 
   // Predicted (a priori) estimate covariance
-  m_P = m_A * m_P * tvmet::trans(m_A) + m_Q;
+  //m_P = m_A * m_P * tvmet::trans(m_A) + m_Q;
+  m_P = m_A * m_P * m_A.transpose() + m_Q;
   
   
 
@@ -41,10 +42,12 @@ double KalmanFilter::filtering(double y, double u)
   // Measurement Update (Correct)
   //
   // Innovation or measurement residual
-  double e = y - dot(m_C, m_x);
+  //double e = y - dot(m_C, m_x);
+  double e = y - m_C.dot(m_x);
 
   // Innovation (or residual) covariance
-  double S = dot( tvmet::trans(m_P) * m_C, m_C) + m_R;
+  //double S = dot( tvmet::trans(m_P) * m_C, m_C) + m_R;
+  double S = tvector(m_P.transpose() * m_C).dot(m_C) + m_R;
 
   // Optimal Kalman gain
   m_K = m_P * m_C / S;
@@ -53,9 +56,11 @@ double KalmanFilter::filtering(double y, double u)
   m_x = m_x + m_K * e;
 
   // Updated (a posteriori) estimate covariance
-  m_P = (1 - dot(m_K, m_C)) * m_P;
+  //m_P = (1 - dot(m_K, m_C)) * m_P;
+  m_P = (1 - m_K.dot(m_C)) * m_P;
 
-  m_y = dot(m_C, m_x);
+  //m_y = dot(m_C, m_x);
+  m_y = m_C.dot(m_x);
 
   return m_y;
 }
