@@ -142,7 +142,7 @@ RTC::ReturnCode_t creekReferenceHolder::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t creekReferenceHolder::onExecute(RTC::UniqueId ec_id)
 {
   if( m_qCurIn.isNew() ) m_qCurIn.read();
-  
+
   if( m_qIn.isNew() )       m_qIn.read();
   if( m_basePosIn.isNew() ) m_basePosIn.read();
   if( m_baseRpyIn.isNew() ) m_baseRpyIn.read();

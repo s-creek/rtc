@@ -44,8 +44,6 @@ private:
   bool m_isInit;
   std::vector<double> m_qPre;
   std::vector<double> m_qRefPre;
-
-  double m_rate;
 };
 
 extern "C"

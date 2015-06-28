@@ -4,7 +4,7 @@
 
 #include <cnoid/BodyLoader>
 #include <cnoid/Link>
-#include <cnoid/EigenUtil>
+
 double tcount(0.0);
 static const char* creeksequenceplayer_spec[] =
   {
