@@ -2,6 +2,7 @@
 // reference url : http://tom.pycke.be/mav/71/kalman-filtering-of-imu-data
 //
 #include "creekStateEstimator.h"
+#include "CheckCounter.h"
 
 // tvmet (from OpenHRP)
 //#include <tvmet/Matrix.h>
@@ -93,6 +94,7 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
     std::cerr << "creekStateEstimator failed to prop[dt] " << prop["dt"] << "" << std::endl;
     return RTC::RTC_ERROR;
   }
+  SET_CHECK_COUNTER;
 
 
   for(int i=0; i<3; i++) {
@@ -103,7 +105,7 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
     m_kf[i].setA(1, -m_dt, 0, 1);
     m_kf[i].setB(m_dt, 0);
   }
-
+  
 
   return RTC::RTC_OK;
 }
@@ -112,7 +114,7 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
 RTC::ReturnCode_t creekStateEstimator::onActivated(RTC::UniqueId ec_id)
 {
   std::cout << "creekStateEstimator : onActivated" << std::endl;
-
+  cc::m_stepCounter=0;
   return RTC::RTC_OK;
 }
 
@@ -126,8 +128,14 @@ RTC::ReturnCode_t creekStateEstimator::onExecute(RTC::UniqueId ec_id)
     m_accRefIn.read();
   }
   else {
-    for(int i=0; i<3; i++) m_accRef.data[i] = 0.0;
+    //for(int i=0; i<3; i++) m_accRef.data[i] = 0.0;
   }
+
+
+  //
+  // sync
+  //
+  CHECK_COUNTER(cc::m_stepCounter);
 
 
   //

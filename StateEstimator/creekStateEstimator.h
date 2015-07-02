@@ -46,6 +46,8 @@ protected:
 private:
   double m_dt;
   creek::KalmanFilter m_kf[3];
+
+  //int m_stepCounter, m_nStep;
 };
 
 extern "C"
