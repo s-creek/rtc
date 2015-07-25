@@ -93,8 +93,8 @@ RTC::ReturnCode_t creekQrCodeReader::onExecute(RTC::UniqueId ec_id)
 
 
     cv::cvtColor(m_frame, m_frame, CV_RGB2BGR);
-    cv::imshow("image", m_frame);
-    cv::imshow("gray", m_gray);
+    cv::imshow("QrCodeReader:image", m_frame);
+    cv::imshow("QrCodeReader:gray", m_gray);
     //cv::waitKey(1);
 
     return RTC::RTC_OK;

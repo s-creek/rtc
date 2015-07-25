@@ -115,7 +115,7 @@ RTC::ReturnCode_t creekPhysicalCamera::onExecute(RTC::UniqueId ec_id)
     m_imageOut.write();
 
     if( m_show )
-      cv::imshow( "image", m_frame );
+      cv::imshow( "PhysicalCamera:image", m_frame );
     else
       cv::destroyWindow( "image" );
 
