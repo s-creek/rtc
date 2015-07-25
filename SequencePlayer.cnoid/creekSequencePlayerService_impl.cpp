@@ -26,7 +26,7 @@ void creekSequencePlayerService_impl::waitInterpolation()
 ::CORBA::Boolean creekSequencePlayerService_impl::setJointAngles(const OpenHRP::dSequence& jvs, ::CORBA::Double tm)
 {
   if( jvs.length() != m_comp->dof() ) {
-    std::cout << "creekSequencePlayerService : error"<< std::endl;
+    std::cout << "creekSequencePlayerService : error input num=" << jvs.length() << ", robot dof = " << m_comp->dof() << std::endl;
     return false;
   }
   return m_comp->setJointAngles(jvs.get_buffer(), tm);

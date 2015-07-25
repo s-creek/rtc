@@ -72,7 +72,8 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
   // get properties
   //
   RTC::Properties& prop = getProperties();
-  coil::stringTo(m_dt, prop["dt"].c_str());
+  //coil::stringTo(m_dt, prop["dt"].c_str());
+  coil::stringTo(m_dt, prop["pdservo.dt"].c_str());
 
 
   //
