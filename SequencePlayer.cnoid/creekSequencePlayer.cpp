@@ -1,11 +1,12 @@
 // -*- C++ -*-
 
 #include "creekSequencePlayer.h"
+#include "../util/CheckCounter.h"
 
 #include <cnoid/BodyLoader>
 #include <cnoid/Link>
 
-double tcount(0.0);
+
 static const char* creeksequenceplayer_spec[] =
   {
     "implementation_id", "creekSequencePlayer",
@@ -72,8 +73,8 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
   // get properties
   //
   RTC::Properties& prop = getProperties();
-  //coil::stringTo(m_dt, prop["dt"].c_str());
-  coil::stringTo(m_dt, prop["pdservo.dt"].c_str());
+  coil::stringTo(m_dt, prop["dt"].c_str());
+  //coil::stringTo(m_dt, prop["pdservo.dt"].c_str());
 
 
   //
@@ -99,6 +100,8 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
   m_qInit.data.length(m_dof);
   for(unsigned int i=0; i<m_dof; i++) m_qInit.data[i] = 0.0;
 
+
+  SET_CHECK_COUNTER;
   return RTC::RTC_OK;
 }
 
@@ -150,16 +153,13 @@ RTC::ReturnCode_t creekSequencePlayer::onActivated(RTC::UniqueId ec_id)
     m_waitSem.post();
   }
 
-  tcount = 0.0;
+ 
   return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t creekSequencePlayer::onExecute(RTC::UniqueId ec_id)
 {
-  tcount+=m_dt;
-  //std::cout << "seq : time = " << tcount << std::endl;
-
   if( m_qInitIn.isNew() )       m_qInitIn.read();
   if( m_basePosInitIn.isNew() ) m_basePosInitIn.read();
   if( m_baseRpyInitIn.isNew() ) m_baseRpyInitIn.read();
@@ -170,7 +170,10 @@ RTC::ReturnCode_t creekSequencePlayer::onExecute(RTC::UniqueId ec_id)
     m_waitFlag = false;
     m_waitSem.post();
   }
- 
+
+
+  CHECK_COUNTER(cc::m_stepCounter);
+
 
   if( !m_seq[ANGLES]->empty() ) {
     m_seq[ANGLES]->get(m_qRef.data.get_buffer());

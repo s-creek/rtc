@@ -1,6 +1,7 @@
 // -*- C++ -*-
 
 #include "creekReferenceHolder.h"
+#include "../util/CheckCounter.h"
 
 #include <cnoid/BodyLoader>
 #include <cnoid/Link>
@@ -117,6 +118,7 @@ RTC::ReturnCode_t creekReferenceHolder::onInitialize()
 	    << "    zmp pos  = " << m_zmpRef.data.x  << ", " << m_zmpRef.data.y  << ", " << m_zmpRef.data.z  << "\n";
 
 
+  SET_CHECK_COUNTER;
   return RTC::RTC_OK;
 }
 
@@ -147,6 +149,9 @@ RTC::ReturnCode_t creekReferenceHolder::onExecute(RTC::UniqueId ec_id)
   if( m_basePosIn.isNew() ) m_basePosIn.read();
   if( m_baseRpyIn.isNew() ) m_baseRpyIn.read();
   if( m_zmpRefIn.isNew() )  m_zmpRefIn.read();
+
+
+  CHECK_COUNTER(cc::m_stepCounter);
 
 
   m_qOut.write();

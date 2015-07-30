@@ -2,7 +2,7 @@
 // reference url : http://tom.pycke.be/mav/71/kalman-filtering-of-imu-data
 //
 #include "creekStateEstimator.h"
-#include "CheckCounter.h"
+#include "../util/CheckCounter.h"
 
 // tvmet (from OpenHRP)
 //#include <tvmet/Matrix.h>
