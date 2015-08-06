@@ -1,0 +1,10 @@
+module OpenHRP
+{
+ interface creekPointCloudViewerService
+  {
+    void start();
+    void stop();
+
+    void test();
+  };
+};

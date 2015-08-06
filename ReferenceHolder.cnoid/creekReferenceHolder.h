@@ -54,6 +54,7 @@ protected:
 
 private:
   cnoid::BodyPtr m_robot;
+  bool m_goAct;
 };
 
 

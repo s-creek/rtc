@@ -23,4 +23,13 @@ namespace cc
     cc::m_nStep = int( cc_dt/cc_pd_dt + 1e-12);			\
   }
 
+#define SET_CHECK_COUNTER2(dt)					\
+  {								\
+    RTC::Properties& cc_prop = getProperties();			\
+    double cc_dt, cc_pd_dt;					\
+    cc_dt = (dt);						\
+    coil::stringTo(cc_pd_dt, cc_prop["pdservo.dt"].c_str());	\
+    cc::m_nStep = int( cc_dt/cc_pd_dt + 1e-12);			\
+  }
+
 #endif

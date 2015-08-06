@@ -36,7 +36,8 @@ creekReferenceHolder::creekReferenceHolder(RTC::Manager* manager)
     m_baseRpyIn ("baseRpyIn",  m_baseRpy),
     m_baseRpyOut("baseRpyOut", m_baseRpy),
     m_zmpRefIn ("zmpRefIn",  m_zmpRef),
-    m_zmpRefOut("zmpRefOut", m_zmpRef)
+    m_zmpRefOut("zmpRefOut", m_zmpRef),
+    m_goAct(true)
 {
 }
 
@@ -129,9 +130,10 @@ RTC::ReturnCode_t creekReferenceHolder::onActivated(RTC::UniqueId ec_id)
 
   if( m_qCurIn.isNew() ) {
     m_qCurIn.read();
-    std::cout << "holder : q0 = " << m_qCur.data[0] << std::endl;
+    //std::cout << "holder : q0 = " << m_qCur.data[0] << std::endl;
     unsigned int dof = m_robot->numJoints();
     memcpy(m_q.data.get_buffer(), m_qCur.data.get_buffer(), sizeof(double)*dof );
+    m_goAct = true;
   }
   else {
     std::cout << "creekReferenceHolder : connection error" << std::endl;
@@ -153,6 +155,11 @@ RTC::ReturnCode_t creekReferenceHolder::onExecute(RTC::UniqueId ec_id)
 
   CHECK_COUNTER(cc::m_stepCounter);
 
+  if( m_goAct ) {
+    unsigned int dof = m_robot->numJoints();
+    memcpy(m_q.data.get_buffer(), m_qCur.data.get_buffer(), sizeof(double)*dof );
+    m_goAct = false;
+  }
 
   m_qOut.write();
   m_basePosOut.write();
