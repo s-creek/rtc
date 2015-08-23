@@ -24,6 +24,15 @@ void creekPointCloudViewerService_impl::stop()
     m_comp->stop();
 }
 
+
+bool creekPointCloudViewerService_impl::detectLandingPoint(double x, double y, double w, int ft)
+{
+  if( m_comp != NULL )
+    return m_comp->detectLandingPoint(x,y,w,ft);
+  else
+    return false;
+}
+
 void creekPointCloudViewerService_impl::test()
 {
   if( m_comp != NULL )

@@ -16,11 +16,16 @@
 #include "creekPointCloudViewerService_impl.h"
 
 #include <cnoid/Body>
+#include <cnoid/Link>
 #include <cnoid/RangeSensor>
 
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/io/ply_io.h>
+
+#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 
 using namespace RTC;
 
@@ -37,6 +42,7 @@ public:
 
   void start();
   void stop();
+  bool detectLandingPoint(double x, double y, double w, int ft);
   void test();
 
 
@@ -60,7 +66,7 @@ private:
   cnoid::BodyPtr m_robot;
   cnoid::RangeSensorPtr m_sensor;
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr m_cloud;
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_cloud;
   //boost::shared_ptr<pcl::visualization::CloudViewer> m_viewer;
   pcl::visualization::PCLVisualizer::Ptr m_viewer;
 
@@ -73,6 +79,10 @@ private:
     cnoid::Matrix3 R;
   };
   std::deque<TimedCoordinateSystem> m_tcsSeq;
+
+  double m_ankleHeight;
+  cnoid::Link * m_rfoot, *m_lfoot;
+  vtkSmartPointer<vtkTransform> m_rfootT, m_lfootT;
 };
 
 
