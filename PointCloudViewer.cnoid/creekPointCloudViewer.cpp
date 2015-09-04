@@ -214,7 +214,8 @@ RTC::ReturnCode_t creekPointCloudViewer::onExecute(RTC::UniqueId ec_id)
     }
     m_robot->rootLink()->p() << m_basePos.data.x, m_basePos.data.y, m_basePos.data.z;
     //m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpy.data.r, m_baseRpy.data.p, m_baseRpy.data.y);
-    m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpyAct.data.r, m_baseRpyAct.data.p+0.004, m_baseRpy.data.y);
+    //m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpyAct.data.r, m_baseRpyAct.data.p+0.004, m_baseRpy.data.y);
+    m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpyAct.data.r, m_baseRpyAct.data.p, m_baseRpy.data.y);
     m_robot->calcForwardKinematics();
 
     // calc sensor p,R (on world)
@@ -342,7 +343,7 @@ void creekPointCloudViewer::stop()
   for(double x= -m_footSize[1]; x<= m_footSize[0]; x+=m_samplingSize) {
     for(double y=-m_footSize[2]; y<=m_footSize[3]; y+=m_samplingSize) {
       cnoid::Vector3 r = m_rfoot->p() + m_rfoot->R() * cnoid::Vector3( x, y, -m_ankleHeight);
-      cnoid::Vector3 l = m_lfoot->p() + m_lfoot->R() * cnoid::Vector3(-x, y, -m_ankleHeight);
+      cnoid::Vector3 l = m_lfoot->p() + m_lfoot->R() * cnoid::Vector3( x,-y, -m_ankleHeight);
 
       pcl::PointXYZRGB rp, lp;
       rp.x = r[0];  rp.y = r[1];  rp.z = r[2];
@@ -565,7 +566,7 @@ bool creekPointCloudViewer::fittingFootPosition(std::vector<int> &indices, cnoid
     c2rh << -m_footSize[1]-margin, -m_footSize[2]-margin, 0;
     c2lh << -m_footSize[1]-margin,  m_footSize[3]+margin, 0;
   }
-  else if( ft == 0 ) {
+  else if( ft == 1 ) {
     c2rt <<  m_footSize[0]+margin, -m_footSize[3]-margin, 0;
     c2lt <<  m_footSize[0]+margin,  m_footSize[2]+margin, 0;
     c2rh << -m_footSize[1]-margin, -m_footSize[3]-margin, 0;
