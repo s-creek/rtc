@@ -14,6 +14,8 @@ module OpenHRP
     boolean setZmp(in dSequence zmp, in double tm);
     
     boolean isEmpty();
+
+    void jointCalib(in long scale);
     
     //void loadPattern(in string basename, in double tm);
     

@@ -39,6 +39,7 @@ creekQrCodeReader::~creekQrCodeReader()
 
 RTC::ReturnCode_t creekQrCodeReader::onInitialize()
 {
+  std::cout << "creekQrCodeReader : onInitialize" << std::endl;
   addInPort("image", m_imageIn);
 
   m_creekQrCodeReaderServicePort.registerProvider("service0", "creekQrCodeReaderService", m_service0);
@@ -55,6 +56,7 @@ RTC::ReturnCode_t creekQrCodeReader::onInitialize()
 
 RTC::ReturnCode_t creekQrCodeReader::onActivated(RTC::UniqueId ec_id)
 {
+  std::cout << "creekQrCodeReader : onActivated" << std::endl;
   if( m_imageIn.isNew() ) {
     if( !updateImage() )
       return RTC::RTC_ERROR;
@@ -71,6 +73,7 @@ RTC::ReturnCode_t creekQrCodeReader::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t creekQrCodeReader::onDeactivated(RTC::UniqueId ec_id)
 {
+  std::cout << "creekQrCodeReader : onDeactivated" << std::endl;
   return RTC::RTC_OK;
 }
 

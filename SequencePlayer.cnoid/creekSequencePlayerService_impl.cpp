@@ -61,6 +61,11 @@ void creekSequencePlayerService_impl::waitInterpolation()
 }
 
 
+void creekSequencePlayerService_impl::jointCalib(int scale)
+{
+  m_comp->jointCalib(scale);
+}
+
 
 // End of example implementational code
 

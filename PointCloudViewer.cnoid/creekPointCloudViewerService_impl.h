@@ -18,6 +18,7 @@ public:
   void start();
   void stop();
   bool detectLandingPoint(double x, double y, double w, int ft);
+  void getLandingPoint(double &x, double &y, double &z, double &r, double &p, double &w, int ft);
   void test();
 
   void setComponent(creekPointCloudViewer *in_comp) { m_comp = in_comp; }

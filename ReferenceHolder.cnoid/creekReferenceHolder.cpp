@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
 #include "creekReferenceHolder.h"
-#include "../util/CheckCounter.h"
+//#include "../util/CheckCounter.h"
 
 #include <cnoid/BodyLoader>
 #include <cnoid/Link>
@@ -25,6 +25,10 @@ static const char* creekreferenceholder_spec[] =
     ""
   };
 
+template <class T> double toSec(T t)
+{
+  return t.sec + t.nsec / 1000000000.0;
+}
 
 creekReferenceHolder::creekReferenceHolder(RTC::Manager* manager)
   : RTC::DataFlowComponentBase(manager),
@@ -119,7 +123,7 @@ RTC::ReturnCode_t creekReferenceHolder::onInitialize()
 	    << "    zmp pos  = " << m_zmpRef.data.x  << ", " << m_zmpRef.data.y  << ", " << m_zmpRef.data.z  << "\n";
 
 
-  SET_CHECK_COUNTER;
+  //SET_CHECK_COUNTER;
   return RTC::RTC_OK;
 }
 
@@ -143,6 +147,13 @@ RTC::ReturnCode_t creekReferenceHolder::onActivated(RTC::UniqueId ec_id)
 }
 
 
+RTC::ReturnCode_t creekReferenceHolder::onDeactivated(RTC::UniqueId ec_id)
+{
+  std::cout << "creekReferenceHolder : onDeactivated" << std::endl;
+  return RTC::RTC_OK;
+}
+
+
 RTC::ReturnCode_t creekReferenceHolder::onExecute(RTC::UniqueId ec_id)
 {
   if( m_qCurIn.isNew() ) m_qCurIn.read();
@@ -152,8 +163,9 @@ RTC::ReturnCode_t creekReferenceHolder::onExecute(RTC::UniqueId ec_id)
   if( m_baseRpyIn.isNew() ) m_baseRpyIn.read();
   if( m_zmpRefIn.isNew() )  m_zmpRefIn.read();
 
-
-  CHECK_COUNTER(cc::m_stepCounter);
+  //std::cout << "creekReferenceHolder : time = " << toSec(m_qCur.tm) << std::endl;
+  //CHECK_COUNTER(cc::m_stepCounter);
+  //std::cout << "creekReferenceHolder : check time = " << toSec(m_qCur.tm) << std::endl;
 
   if( m_goAct ) {
     unsigned int dof = m_robot->numJoints();

@@ -9,6 +9,7 @@ module OpenHRP
     // w : yaw (rotate z-axis)
     // ft : foot-type (0=R, 1=L)
     boolean detectLandingPoint(in double x, in double y, in double w, in long ft);
+    void getLandingPoint(out double x, out double y, out double z, out double r, out double p, out double w, in long ft);
 
     void test();
   };

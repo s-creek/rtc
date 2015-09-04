@@ -19,6 +19,7 @@ public:
 
   virtual RTC::ReturnCode_t onInitialize();
   virtual RTC::ReturnCode_t onActivated(RTC::UniqueId ec_id);
+  virtual RTC::ReturnCode_t onDeactivated(RTC::UniqueId ec_id);
   virtual RTC::ReturnCode_t onExecute(RTC::UniqueId ec_id);
 
 
@@ -44,6 +45,10 @@ private:
   bool m_isInit;
   std::vector<double> m_qPre;
   std::vector<double> m_qRefPre;
+
+  unsigned int m_calcGainMode;
+  std::vector<double> m_maxErr;
+  std::vector<int> m_count;
 };
 
 extern "C"

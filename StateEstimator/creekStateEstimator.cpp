@@ -2,7 +2,7 @@
 // reference url : http://tom.pycke.be/mav/71/kalman-filtering-of-imu-data
 //
 #include "creekStateEstimator.h"
-#include "../util/CheckCounter.h"
+//#include "../util/CheckCounter.h"
 
 // tvmet (from OpenHRP)
 //#include <tvmet/Matrix.h>
@@ -94,7 +94,7 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
     std::cerr << "creekStateEstimator failed to prop[dt] " << prop["dt"] << "" << std::endl;
     return RTC::RTC_ERROR;
   }
-  SET_CHECK_COUNTER;
+  //SET_CHECK_COUNTER;
 
 
   for(int i=0; i<3; i++) {
@@ -114,7 +114,14 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
 RTC::ReturnCode_t creekStateEstimator::onActivated(RTC::UniqueId ec_id)
 {
   std::cout << "creekStateEstimator : onActivated" << std::endl;
-  cc::m_stepCounter=0;
+  //cc::m_stepCounter=0;
+  return RTC::RTC_OK;
+}
+
+
+RTC::ReturnCode_t creekStateEstimator::onDeactivated(RTC::UniqueId ec_id)
+{
+  std::cout << "creekStateEstimator : onDeactivated" << std::endl;
   return RTC::RTC_OK;
 }
 
@@ -135,7 +142,7 @@ RTC::ReturnCode_t creekStateEstimator::onExecute(RTC::UniqueId ec_id)
   //
   // sync
   //
-  CHECK_COUNTER(cc::m_stepCounter);
+  //CHECK_COUNTER(cc::m_stepCounter);
 
 
   //
@@ -178,13 +185,13 @@ RTC::ReturnCode_t creekStateEstimator::onExecute(RTC::UniqueId ec_id)
   m_rpy.data.p = m_kf[1].filtering(rpy(1), m_gyroSensor.data[1]);
   m_rpy.data.y = m_kf[2].filtering(rpy(2), m_gyroSensor.data[2]);
 
-
+  
   /*
   // debug
   rpy << m_rpy.data.r, m_rpy.data.p, m_rpy.data.y;
   Vector3 rpyDeg;
   rpyDeg = rpy / M_PI * 180.0;
-  std::cout << "kf : " << rpyDeg(0) << ", " << rpyDeg(1) << ", " << rpyDeg(2) << std::endl;
+  std::cout << "creekStateEstimator : " << rpyDeg(0) << ", " << rpyDeg(1) << ", " << rpyDeg(2) << std::endl;
   */
 
   m_rpyOut.write();

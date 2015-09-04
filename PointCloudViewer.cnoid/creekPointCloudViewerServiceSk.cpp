@@ -269,9 +269,103 @@ _0RL_lcfn_b22f7375262a75a3_40000000(omniCallDescriptor* cd, omniServant* svnt)
 
 
 }
+// Proxy call descriptor class. Mangled signature:
+//  void_o_cdouble_o_cdouble_o_cdouble_o_cdouble_o_cdouble_o_cdouble_i_clong
+class _0RL_cd_b22f7375262a75a3_50000000
+  : public omniCallDescriptor
+{
+public:
+  inline _0RL_cd_b22f7375262a75a3_50000000(LocalCallFn lcfn,const char* op_,size_t oplen,_CORBA_Boolean upcall=0):
+     omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
+  {
+    
+  }
+  
+  void marshalArguments(cdrStream&);
+  void unmarshalArguments(cdrStream&);
+
+  void unmarshalReturnedValues(cdrStream&);
+  void marshalReturnedValues(cdrStream&);
+  
+  
+  static const char* const _user_exns[];
+
+  ::CORBA::Double arg_0;
+  ::CORBA::Double arg_1;
+  ::CORBA::Double arg_2;
+  ::CORBA::Double arg_3;
+  ::CORBA::Double arg_4;
+  ::CORBA::Double arg_5;
+  ::CORBA::Long arg_6;
+};
+
+void _0RL_cd_b22f7375262a75a3_50000000::marshalArguments(cdrStream& _n)
+{
+  arg_6 >>= _n;
+
+}
+
+void _0RL_cd_b22f7375262a75a3_50000000::unmarshalArguments(cdrStream& _n)
+{
+  (::CORBA::Long&)arg_6 <<= _n;
+
+}
+
+void _0RL_cd_b22f7375262a75a3_50000000::marshalReturnedValues(cdrStream& _n)
+{
+  arg_0 >>= _n;
+  arg_1 >>= _n;
+  arg_2 >>= _n;
+  arg_3 >>= _n;
+  arg_4 >>= _n;
+  arg_5 >>= _n;
+
+}
+
+void _0RL_cd_b22f7375262a75a3_50000000::unmarshalReturnedValues(cdrStream& _n)
+{
+  (::CORBA::Double&)arg_0 <<= _n;
+  (::CORBA::Double&)arg_1 <<= _n;
+  (::CORBA::Double&)arg_2 <<= _n;
+  (::CORBA::Double&)arg_3 <<= _n;
+  (::CORBA::Double&)arg_4 <<= _n;
+  (::CORBA::Double&)arg_5 <<= _n;
+
+}
+
+const char* const _0RL_cd_b22f7375262a75a3_50000000::_user_exns[] = {
+  0
+};
+
 // Local call call-back function.
 static void
-_0RL_lcfn_b22f7375262a75a3_50000000(omniCallDescriptor*, omniServant* svnt)
+_0RL_lcfn_b22f7375262a75a3_60000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_b22f7375262a75a3_50000000* tcd = (_0RL_cd_b22f7375262a75a3_50000000*)cd;
+  OpenHRP::_impl_creekPointCloudViewerService* impl = (OpenHRP::_impl_creekPointCloudViewerService*) svnt->_ptrToInterface(OpenHRP::creekPointCloudViewerService::_PD_repoId);
+  impl->getLandingPoint(tcd->arg_0, tcd->arg_1, tcd->arg_2, tcd->arg_3, tcd->arg_4, tcd->arg_5, tcd->arg_6);
+
+
+}
+
+void OpenHRP::_objref_creekPointCloudViewerService::getLandingPoint(::CORBA::Double& x, ::CORBA::Double& y, ::CORBA::Double& z, ::CORBA::Double& r, ::CORBA::Double& p, ::CORBA::Double& w, ::CORBA::Long ft)
+{
+  _0RL_cd_b22f7375262a75a3_50000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_60000000, "getLandingPoint", 16);
+  _call_desc.arg_6 = ft;
+
+  _invoke(_call_desc);
+  x = _call_desc.arg_0;
+  y = _call_desc.arg_1;
+  z = _call_desc.arg_2;
+  r = _call_desc.arg_3;
+  p = _call_desc.arg_4;
+  w = _call_desc.arg_5;
+
+
+}
+// Local call call-back function.
+static void
+_0RL_lcfn_b22f7375262a75a3_70000000(omniCallDescriptor*, omniServant* svnt)
 {
   
   OpenHRP::_impl_creekPointCloudViewerService* impl = (OpenHRP::_impl_creekPointCloudViewerService*) svnt->_ptrToInterface(OpenHRP::creekPointCloudViewerService::_PD_repoId);
@@ -282,7 +376,7 @@ _0RL_lcfn_b22f7375262a75a3_50000000(omniCallDescriptor*, omniServant* svnt)
 
 void OpenHRP::_objref_creekPointCloudViewerService::test()
 {
-  _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_50000000, "test", 5);
+  _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_70000000, "test", 5);
 
 
   _invoke(_call_desc);
@@ -343,9 +437,17 @@ OpenHRP::_impl_creekPointCloudViewerService::_dispatch(omniCallHandle& _handle)
     return 1;
   }
 
+  if( omni::strMatch(op, "getLandingPoint") ) {
+
+    _0RL_cd_b22f7375262a75a3_50000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_60000000, "getLandingPoint", 16, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
   if( omni::strMatch(op, "test") ) {
 
-    _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_50000000, "test", 5, 1);
+    _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_70000000, "test", 5, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;

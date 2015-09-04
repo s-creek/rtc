@@ -20,9 +20,8 @@
 #include <cnoid/RangeSensor>
 
 #include <pcl/point_types.h>
-#include <pcl/visualization/cloud_viewer.h>
+//#include <pcl/visualization/cloud_viewer.h>
 #include <pcl/visualization/pcl_visualizer.h>
-#include <pcl/io/ply_io.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
@@ -43,6 +42,7 @@ public:
   void start();
   void stop();
   bool detectLandingPoint(double x, double y, double w, int ft);
+  void getLandingPoint(double &x, double &y, double &z, double &r, double &p, double &w, int ft);
   void test();
 
 
@@ -57,12 +57,16 @@ protected:
   RTC::InPort<RTC::TimedPoint3D>  m_basePosIn;
   RTC::TimedOrientation3D               m_baseRpy;
   RTC::InPort<RTC::TimedOrientation3D>  m_baseRpyIn;
+  RTC::TimedOrientation3D               m_baseRpyAct;
+  RTC::InPort<RTC::TimedOrientation3D>  m_baseRpyActIn;
 
   RTC::CorbaPort m_creekPointCloudViewerServicePort;
   creekPointCloudViewerService_impl m_service0;
 
 
 private:
+  bool fittingFootPosition(std::vector<int> &indices, cnoid::Vector3 &pos, cnoid::Matrix3 &rot, int ft, int maxTrialNum=1, double margin=0.01);
+
   cnoid::BodyPtr m_robot;
   cnoid::RangeSensorPtr m_sensor;
 
@@ -81,8 +85,12 @@ private:
   std::deque<TimedCoordinateSystem> m_tcsSeq;
 
   double m_ankleHeight;
+  std::vector<double> m_footSize;  // toe, heel, outer, inner
   cnoid::Link * m_rfoot, *m_lfoot;
   vtkSmartPointer<vtkTransform> m_rfootT, m_lfootT;
+  cnoid::Position m_rsole, m_lsole;
+
+  double m_samplingSize, m_planeThreshold, m_octSearchSize;
 };
 
 

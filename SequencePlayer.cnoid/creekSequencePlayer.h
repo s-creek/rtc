@@ -29,6 +29,7 @@ public:
 
   virtual RTC::ReturnCode_t onInitialize();
   virtual RTC::ReturnCode_t onActivated(RTC::UniqueId ec_id);
+  virtual RTC::ReturnCode_t onDeactivated(RTC::UniqueId ec_id);
   virtual RTC::ReturnCode_t onExecute(RTC::UniqueId ec_id);
 
 
@@ -40,6 +41,9 @@ public:
   bool setBaseRpy(const double *rpy, double tm);
   bool setZmp(const double *zmp, double tm);
   bool isEmpty();
+
+  void jointCalib(int scale);
+
 
 protected:
   //

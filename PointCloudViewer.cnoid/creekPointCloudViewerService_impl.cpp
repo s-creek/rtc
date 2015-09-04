@@ -33,6 +33,14 @@ bool creekPointCloudViewerService_impl::detectLandingPoint(double x, double y, d
     return false;
 }
 
+
+void creekPointCloudViewerService_impl::getLandingPoint(double &x, double &y, double &z, double &r, double &p, double &w, int ft)
+{
+  if( m_comp != NULL )
+    return m_comp->getLandingPoint(x,y,z,r,p,w,ft);
+}
+
+
 void creekPointCloudViewerService_impl::test()
 {
   if( m_comp != NULL )

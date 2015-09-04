@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
 #include "creekSequencePlayer.h"
-#include "../util/CheckCounter.h"
+//#include "../util/CheckCounter.h"
 
 #include <cnoid/BodyLoader>
 #include <cnoid/Link>
@@ -101,7 +101,7 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
   for(unsigned int i=0; i<m_dof; i++) m_qInit.data[i] = 0.0;
 
 
-  SET_CHECK_COUNTER;
+  //SET_CHECK_COUNTER;
   return RTC::RTC_OK;
 }
 
@@ -158,6 +158,13 @@ RTC::ReturnCode_t creekSequencePlayer::onActivated(RTC::UniqueId ec_id)
 }
 
 
+RTC::ReturnCode_t creekSequencePlayer::onDeactivated(RTC::UniqueId ec_id)
+{
+  std::cout << "creekSequencePlayer : onDeactivated" << std::endl;
+  return RTC::RTC_OK;
+}
+
+
 RTC::ReturnCode_t creekSequencePlayer::onExecute(RTC::UniqueId ec_id)
 {
   if( m_qInitIn.isNew() )       m_qInitIn.read();
@@ -172,7 +179,7 @@ RTC::ReturnCode_t creekSequencePlayer::onExecute(RTC::UniqueId ec_id)
   }
 
 
-  CHECK_COUNTER(cc::m_stepCounter);
+  //CHECK_COUNTER(cc::m_stepCounter);
 
 
   if( !m_seq[ANGLES]->empty() ) {
@@ -313,6 +320,65 @@ void creekSequencePlayer::calcCoM()
 	    << "\n"
 	    << "ground  = " << ground(0)  << ", " << ground(1)  << ", " << ground(2)
 	    << std::endl << std::endl;
+}
+
+
+void creekSequencePlayer::jointCalib(int scale)
+{
+  if( m_qInit.data.length() != m_dof ) return;
+
+
+  std::string name;
+  double uangle, langle, time;
+
+  //std::cout << "creekSequencePlayer : jointCalib" << std::endl;
+
+  for(int i=0; i<m_robot->numJoints(); i++) {
+    name  = m_robot->joint(i)->name();
+    /*
+    std::cout << name << std::endl;
+    std::cout << "    " << m_qInit.data[i] 
+	      << ",  " << m_robot->joint(i)->q_upper()
+	      << ",  " << m_robot->joint(i)->dq_upper()
+	      << ",  " << m_robot->joint(i)->q_lower()
+	      << ",  " << m_robot->joint(i)->dq_lower()
+	      << std::endl;
+    */
+
+    if( std::isnan( m_qInit.data[i] ) ) {
+      std::cout << "nan" << std::endl;
+      m_qInit.data[i] = 0.0;
+    }
+
+
+    // to upper
+    uangle = m_robot->joint(i)->q_upper() * 0.9;
+    time   = std::fabs( ( uangle - m_qInit.data[i] ) / m_robot->joint(i)->dq_upper() * scale ) + 0.5;
+
+    //std::cout << "    to upper,    angle = " << uangle << ",    time = " << time << std::endl;
+
+    setJointAngle( name.c_str(), uangle, time );
+    waitInterpolation();
+
+
+    // to lower
+    langle = m_robot->joint(i)->q_lower() * 0.9;
+    time   = std::fabs( ( langle - uangle ) / m_robot->joint(i)->dq_lower() * scale ) + 0.5;    
+
+    //std::cout << "    to lower,    angle = " << langle << ",    time = " << time << std::endl;
+
+    setJointAngle( name.c_str(), langle, time );
+    waitInterpolation();
+
+
+    // to zero
+    time   = std::fabs( ( 0 - langle ) / m_robot->joint(i)->dq_lower() * scale ) + 0.5;
+
+    //std::cout << "    to zero,     angle = " << 0 << ",    time = " << time << std::endl;
+
+    setJointAngle(name.c_str(), 0, std::fabs(time));
+    waitInterpolation();
+  }
 }
 
 
