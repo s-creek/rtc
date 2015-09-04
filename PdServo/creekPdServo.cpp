@@ -2,19 +2,7 @@
 #include "VectorConvert.h"
 
 #include <rtm/CorbaNaming.h>
-
 #include <cmath>
-
-template <class T> double toSec(T t)
-{
-  return t.sec + t.nsec / 1000000000.0;
-}
-
-#define LOGGIN_MODE
-#ifdef LOGGIN_MODE
-#include <fstream>
-std::ofstream logger("/home/ogawa/workspace/git/rtc/PdServo/log/log.dat");
-#endif
 
 // Module specification
 static const char* module_spec[] =
@@ -138,8 +126,6 @@ RTC::ReturnCode_t creekPdServo::onActivated(RTC::UniqueId ec_id)
       m_qRefPre[i]   = m_qCur.data[i];
       m_qRef.data[i] = m_qCur.data[i];
     }
-    //std::cout << "servo : q0 = " << m_qCur.data[0] << std::endl;
-
     for(int i=0; i<m_maxErr.size(); i++) {
       m_maxErr[i] = 0.0;
       m_count[i] = 0;
@@ -183,8 +169,6 @@ RTC::ReturnCode_t creekPdServo::onExecute(RTC::UniqueId ec_id)
   if( m_qCurIn.isNew() )  m_qCurIn.read();
   if( m_qRefIn.isNew() )  m_qRefIn.read();
 
-  //std::cout << "creekPdServo : time = " << toSec(m_qCur.tm) << std::endl;
-
   bool updateGain(false);
   for( int i = 0; i < m_dof; i++) {
     double qCur = m_qCur.data[i];
@@ -199,9 +183,6 @@ RTC::ReturnCode_t creekPdServo::onExecute(RTC::UniqueId ec_id)
     
 
     double e = (m_qRefPre[i] - qCur)/M_PI*180.0;
-#ifdef LOGGIN_MODE
-    logger << " " << e;
-#endif
     if( m_calcGainMode > 0 ) {
       if( std::fabs(e) > thErr[i] + 0.05 && maxGain[i] > m_pGain[i] ) {
 	//std::cout << i << " : " << e << std::endl;
@@ -214,9 +195,7 @@ RTC::ReturnCode_t creekPdServo::onExecute(RTC::UniqueId ec_id)
 	m_maxErr[i] = std::fabs(e);
     }
   }
-#ifdef LOGGIN_MODE
-  logger << std::endl;
-#endif
+
   if( (updateGain && false) || m_calcGainMode > 1 ) {
     std::cout << std::endl;
     std::cout << m_pGain[0];
