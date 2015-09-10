@@ -6,6 +6,7 @@
 #include <cnoid/EigenUtil>
 
 #include <pcl/io/ply_io.h>
+#include <pcl/io/pcd_io.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/sample_consensus/method_types.h>  
 #include <pcl/sample_consensus/model_types.h>  
@@ -61,7 +62,7 @@ creekPointCloudViewer::creekPointCloudViewer(RTC::Manager* manager)
     m_rfootT(vtkSmartPointer<vtkTransform>::New()),
     m_lfootT(vtkSmartPointer<vtkTransform>::New()),
     m_samplingSize(0.01),
-    m_planeThreshold(0.02),
+    m_planeThreshold(0.005),
     m_octSearchSize(0.04)
 {
   m_service0.setComponent(this);
@@ -214,6 +215,7 @@ RTC::ReturnCode_t creekPointCloudViewer::onExecute(RTC::UniqueId ec_id)
     }
     m_robot->rootLink()->p() << m_basePos.data.x, m_basePos.data.y, m_basePos.data.z;
     //m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpy.data.r, m_baseRpy.data.p, m_baseRpy.data.y);
+    //m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpy.data.r, m_baseRpy.data.p+0.004, m_baseRpy.data.y);
     //m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpyAct.data.r, m_baseRpyAct.data.p+0.004, m_baseRpy.data.y);
     m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpyAct.data.r, m_baseRpyAct.data.p, m_baseRpy.data.y);
     m_robot->calcForwardKinematics();
@@ -686,6 +688,12 @@ void creekPointCloudViewer::test()
     std::cout << "      [ r, p, y ] = [ " << m_ranger.geometry.geometry.pose.orientation.r << ", " << m_ranger.geometry.geometry.pose.orientation.p << ", " << m_ranger.geometry.geometry.pose.orientation.y << " ]" << std::endl;
     std::cout << "      [ w, l, h ] = [ " << m_ranger.geometry.geometry.size.w << ", " << m_ranger.geometry.geometry.size.l << ", " << m_ranger.geometry.geometry.size.h << " ]" << std::endl;
   }
+
+
+  if( true ) {
+    //pcl::io::savePCDFile("/home/ogawa/workspace/cnoid/log/JVRC_R1M.pcd", m_cloud);
+    pcl::io::savePCDFileASCII("/home/ogawa/workspace/cnoid/log/JVRC_O1_icp.pcd", *m_cloud);
+  }
 }
 
 
@@ -702,6 +710,7 @@ extern "C"
   }
   
 };
+
 
 
 
