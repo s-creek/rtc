@@ -50,3 +50,6 @@ src/
 *.lib
 *.sbr
 Thumbs.db
+
+
+test/
