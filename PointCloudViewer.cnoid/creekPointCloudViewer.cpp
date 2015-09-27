@@ -733,13 +733,10 @@ bool creekPointCloudViewer::matchingMap()
       vec(i) = tf(i,3);
     }
 
-    m_robot->rootLink()->p() += vec;
+    m_robot->rootLink()->p() = rot * m_robot->rootLink()->p() + vec;
     m_robot->rootLink()->R() = rot * m_robot->rootLink()->R();
-
     rpy =  m_robot->rootLink()->R().eulerAngles(2,1,0);
-    std::cout << m_robot->rootLink()->p().format( Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]") ) << std::endl;
-    std::cout << rpy.format( Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]") ) << std::endl;
-
+    
     m_basePosIcp.data.x = m_robot->rootLink()->p()(0);
     m_basePosIcp.data.y = m_robot->rootLink()->p()(1);
     m_basePosIcp.data.z = m_robot->rootLink()->p()(2);
@@ -750,6 +747,9 @@ bool creekPointCloudViewer::matchingMap()
     
     m_basePosOut.write();
     m_baseRpyOut.write();
+
+    std::cout << m_robot->rootLink()->p().format( Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]") ) << std::endl;
+    std::cout << rpy.format( Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]") ) << std::endl;
   }
   return icp.hasConverged();
 }
