@@ -33,6 +33,8 @@ namespace creek
     inline void setA(double a00, double a01, double a10, double a11)  { m_A(0,0) = a00; m_A(0,1) = a01; m_A(1,0) = a10; m_A(1,1) = a11; }
     inline void setB(double b0, double b1)  { m_B(0) = b0; m_B(1) = b1; }
 
+    inline void setX(double in_x) { m_x(0) = in_x; }
+
     double filtering(double y, double u=0);
     
     inline double get() { return m_y; };

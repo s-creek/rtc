@@ -83,13 +83,23 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
     m_accRef.data[i]     = 0.0;
     //m_rpy.data[i]        = 0.0;
   }
-  m_rpy.data.r=0.0;  m_rpy.data.p=0.0;  m_rpy.data.y=0.0;
+  RTC::Properties& prop = getProperties();
+  coil::vstring tmp = coil::split( prop["initBaseRpy"], "," );
+  std::vector<double> initrpy(tmp.size());
+  std::cout << "creekStateEstimator :";
+  for( int i=0; i<tmp.size(); i++) {
+    coil::stringTo(initrpy[i], tmp[i].c_str());
+    std::cout << " " << tmp[i] << ", " << initrpy[i];
+  }
+  std::cout << std::endl;
+  m_rpy.data.r=initrpy[0];  m_rpy.data.p=initrpy[1];  m_rpy.data.y=initrpy[2];
+  //m_rpy.data.r=0.0;  m_rpy.data.p=0.0;  m_rpy.data.y=0.0;
 
 
   //
   // set default param
   //
-  RTC::Properties& prop = getProperties();
+  //RTC::Properties& prop = getProperties();
   if ( ! coil::stringTo(m_dt, prop["dt"].c_str()) ) {
     std::cerr << "creekStateEstimator failed to prop[dt] " << prop["dt"] << "" << std::endl;
     return RTC::RTC_ERROR;
@@ -104,6 +114,7 @@ RTC::ReturnCode_t creekStateEstimator::onInitialize()
     m_kf[i].setR(0.03);
     m_kf[i].setA(1, -m_dt, 0, 1);
     m_kf[i].setB(m_dt, 0);
+    m_kf[i].setX(initrpy[i]);
   }
   
 
@@ -192,7 +203,7 @@ RTC::ReturnCode_t creekStateEstimator::onExecute(RTC::UniqueId ec_id)
   Vector3 rpyDeg;
   rpyDeg = rpy / M_PI * 180.0;
   std::cout << "creekStateEstimator : " << rpyDeg(0) << ", " << rpyDeg(1) << ", " << rpyDeg(2) << std::endl;
-  */
+  */  
 
   m_rpyOut.write();
   return RTC::RTC_OK;

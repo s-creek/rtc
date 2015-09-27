@@ -66,7 +66,7 @@ RTC::ReturnCode_t creekQrCodeReader::onActivated(RTC::UniqueId ec_id)
     std::cout << "  data  : " << m_image.data.image.raw_data.length() << std::endl;
     std::cout << "  format: " << m_image.data.image.format << std::endl;
   }
-
+  cv::namedWindow("QrCodeReader:gray", CV_WINDOW_AUTOSIZE);
   return RTC::RTC_OK;
 }
 

@@ -43,6 +43,8 @@ public:
   void stop();
   bool detectLandingPoint(double x, double y, double w, int ft);
   void getLandingPoint(double &x, double &y, double &z, double &r, double &p, double &w, int ft);
+  bool matchingMap();
+  void updateMap();
   void test();
 
 
@@ -60,6 +62,11 @@ protected:
   RTC::TimedOrientation3D               m_baseRpyAct;
   RTC::InPort<RTC::TimedOrientation3D>  m_baseRpyActIn;
 
+  RTC::TimedPoint3D                m_basePosIcp;
+  RTC::OutPort<RTC::TimedPoint3D>  m_basePosOut;
+  RTC::TimedOrientation3D                m_baseRpyIcp;
+  RTC::OutPort<RTC::TimedOrientation3D>  m_baseRpyOut;
+
   RTC::CorbaPort m_creekPointCloudViewerServicePort;
   creekPointCloudViewerService_impl m_service0;
 
@@ -70,7 +77,7 @@ private:
   cnoid::BodyPtr m_robot;
   cnoid::RangeSensorPtr m_sensor;
 
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_cloud;
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_cloud, m_world, m_flag;
   //boost::shared_ptr<pcl::visualization::CloudViewer> m_viewer;
   pcl::visualization::PCLVisualizer::Ptr m_viewer;
 
