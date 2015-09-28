@@ -4,6 +4,7 @@
 #define CREEKCAMERAVIEWER_H
 
 #include <rtm/idl/BasicDataTypeSkel.h>
+#include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>
 #include <rtm/CorbaPort.h>
@@ -15,6 +16,7 @@
 
 #include "CameraPort.h"
 #include <creekQrCodeDetector.h>
+#include <cnoid/EigenUtil>
 
 using namespace RTC;
 
@@ -33,14 +35,27 @@ public:
 protected:
   std::vector< CameraPort * > m_ports;
 
+  std::vector<TimedPose3D>             m_cameraPose;
+  std::vector< InPort<TimedPose3D> * > m_cameraPoseIn;
+
   RTC::CorbaPort m_creekCameraViewerServicePort;
   creekCameraViewerService_impl m_service0;
 
 private:
+  cnoid::Vector3 pixelToVector(double x, double y);
+
   void combineImage();
   cv::Mat m_allImage;
 
   creek::creekQrCodeDetector m_dec;
+  
+  int m_maxSeqNum;
+  struct TimedCoordinateSystem{
+    double tm;
+    cnoid::Vector3 p;
+    cnoid::Matrix3 R;
+  };
+  std::vector< std::deque<TimedCoordinateSystem> > m_tcsSeq;
 };
 
 

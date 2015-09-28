@@ -67,26 +67,24 @@ RTC::ReturnCode_t creekRobotState::onInitialize()
   // get cameras
   m_cameras = m_robot->devices();
   int numCamera = m_cameras.size();
-  double minFrameRate(1.0e+12);
-
+  
 
   // set inport
   m_cameraPose.resize(numCamera);
   m_cameraPoseOut.resize(numCamera);
   for(int i=0; i<numCamera; i++) {
-    m_cameraPoseOut[i] = new OutPort<TimedPose3D>(m_cameras[i]->name().c_str(), m_cameraPose[i]);
-    addOutPort(m_cameras[i]->name().c_str(), *m_cameraPoseOut[i]);
-
-    if( m_cameras[i]->frameRate() < minFrameRate )
-      minFrameRate = m_cameras[i]->frameRate();
+    std::string name = m_cameras[i]->name() + "Pose";
+    m_cameraPoseOut[i] = new OutPort<TimedPose3D>(name.c_str(), m_cameraPose[i]);
+    addOutPort(name.c_str(), *m_cameraPoseOut[i]);
   }
+
 
   m_q.data.length(m_robot->numJoints());
   m_dq.data.length(m_robot->numJoints());
   m_ddq.data.length(m_robot->numJoints());
   for(int i=0; i<m_robot->numJoints(); i++) {
-    m_q.data[i] = 0.0;
-    m_dq.data[i] = 0.0;
+    m_q.data[i]   = 0.0;
+    m_dq.data[i]  = 0.0;
     m_ddq.data[i] = 0.0;
   }
 

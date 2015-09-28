@@ -21,6 +21,12 @@ static const char* creekcameraviewer_spec[] =
   };
 
 
+template <class T> double toSec(T t)
+{
+  return t.sec + t.nsec / 1000000000.0;
+}
+
+
 creekCameraViewer::creekCameraViewer(RTC::Manager* manager)
   : RTC::DataFlowComponentBase(manager),
     m_creekCameraViewerServicePort("creekCameraViewerService")
@@ -42,11 +48,26 @@ RTC::ReturnCode_t creekCameraViewer::onInitialize()
 
   RTC::Properties& prop = getProperties();
   coil::vstring camera_name_list = coil::split( prop["CAMERA_NAME_LIST"], ",");
-  m_ports.resize(camera_name_list.size());
-  for(int i=0; i<camera_name_list.size(); i++) {
+  int n = camera_name_list.size();
+  m_ports.resize(n);
+  for(int i=0; i<n; i++) {
     m_ports[i] = new CameraPort(camera_name_list[i].c_str());
     addInPort(camera_name_list[i].c_str(), *m_ports[i]);
   }
+
+
+  m_cameraPose.resize(n);
+  m_cameraPoseIn.resize(n);
+  for(int i=0; i<n; i++) {
+    std::string name = camera_name_list[i] + "Pose";
+    m_cameraPoseIn[i] = new InPort<TimedPose3D>(name.c_str(), m_cameraPose[i]);
+    addInPort(name.c_str(), *m_cameraPoseIn[i]);
+  }
+
+
+  m_maxSeqNum = 35;
+  m_tcsSeq.resize(n);
+
 
   return RTC::RTC_OK;
 }
@@ -68,6 +89,28 @@ RTC::ReturnCode_t creekCameraViewer::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t creekCameraViewer::onExecute(RTC::UniqueId ec_id)
 {
+  // get camera pose
+  for(int i=0; i<m_cameraPoseIn.size(); i++) {
+    if( m_cameraPoseIn[i]->isNew() ) {
+      m_cameraPoseIn[i]->read();
+
+      TimedCoordinateSystem tmp;
+      tmp.tm = toSec(m_cameraPose[i].tm);
+      tmp.p << m_cameraPose[i].data.position.x, m_cameraPose[i].data.position.y, m_cameraPose[i].data.position.z;
+      tmp.R = cnoid::rotFromRpy(m_cameraPose[i].data.orientation.r, m_cameraPose[i].data.orientation.p, m_cameraPose[i].data.orientation.y);
+
+      // logging
+      m_tcsSeq[i].push_back(tmp);
+      if( m_tcsSeq[i].size() > m_maxSeqNum ) {
+	m_tcsSeq[i].pop_front();
+      }
+
+      //std::cout << m_cameraPoseIn[i]->name() << " : time = " << tmp.tm << ",  pos = " << tmp.p.format(Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]")) << std::endl;
+    }
+  }
+
+
+  // get image data
   for(int i=0; i<m_ports.size(); i++) {
     if( m_ports[i]->isNew() ) {
       m_ports[i]->read();
@@ -83,6 +126,30 @@ RTC::ReturnCode_t creekCameraViewer::onExecute(RTC::UniqueId ec_id)
   //cv::waitKey(1);
 
   return RTC::RTC_OK;
+}
+
+
+//
+//  y              +---------x
+//  |              |
+//  | cnoid        |  OpenCV
+//  |              |
+//  +---------x    y
+//
+cnoid::Vector3 creekCameraViewer::pixelToVector(double x, double y)
+{
+  double width(640), height(480), fieldOfView(1.0);
+
+  double dist = height / 2.0 / tan(fieldOfView/2.0);
+  double cx = (width-1) / 2.0;   // center x
+  double cy = (height-1) / 2.0;  // center y
+
+  double vx =  x - cx;
+  double vy = -y + cy;
+
+  cnoid::Vector3 vec(vx, vy, -dist);
+  vec.normalize();
+  return vec;
 }
 
 
