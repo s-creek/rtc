@@ -5,7 +5,6 @@ script/
 # c++
 *.o
 *.so
-*.conf
 
 # CMake
 CMakeCache.txt
@@ -14,17 +13,16 @@ cmake_install.cmake
 install_manifest.txt
 CMakeFiles
 
-
-bin/
-python/
-src/
-
 # RTC
+*.conf
 *.hh
 *.cc
 *Comp
 *.jar
 
+bin/
+python/
+src/
 
 # VS
 *.obj
