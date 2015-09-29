@@ -1,7 +1,9 @@
 // -*- mode: idl; indent-tabs-mode: t; tab-width: 4; c-basic-offset: 4; -*-
 
 module OpenHRP {
-  interface creekCameraViewerService {
-    void setDraw();
+	interface creekCameraViewerService {
+		void setDraw();
+		void setSearchFlag(in string list);
+		void show();
   };
 };

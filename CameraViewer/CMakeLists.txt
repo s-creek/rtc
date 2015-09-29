@@ -51,7 +51,7 @@ link_directories(${ZBAR_LIBRARY_DIRS})
 
 
 include_directories(${CMAKE_MODULE_PATH})
-include_directories(../../creeklib/creekQrCodeDetector)
+#include_directories(../../creeklib/creekQrCodeDetector)
 
 
 ####
@@ -64,7 +64,7 @@ generate_stub_skel(${comp_name}Service)
 set(comp_sources ${comp_sources} ${comp_name}Service_impl.cpp ${comp_name}ServiceSk.cpp)
 
 set(comp_sources ${comp_sources} CameraPort.cpp)
-set(comp_sources ${comp_sources} ../../creeklib/creekQrCodeDetector/creekQrCodeDetector.cpp)
+#set(comp_sources ${comp_sources} ../../creeklib/creekQrCodeDetector/creekQrCodeDetector.cpp)
 
 add_library(${comp_name} SHARED ${comp_sources})
 target_link_libraries(${comp_name} ${OPENRTM_LIBRARIES})

@@ -4,6 +4,8 @@
 
 #ifndef CREEKCAMERAVIEWERSERVICE_IMPL_H
 #define CREEKCAMERAVIEWERSERVICE_IMPL_H
+
+class creekCameraViewer;
  
 class creekCameraViewerService_impl
   : public virtual POA_OpenHRP::creekCameraViewerService,
@@ -16,8 +18,13 @@ public:
   void setDraw();
   inline bool draw() { return m_draw; }
 
+  void setSearchFlag(const char *list);
+  void show();
+  inline void setComponent(creekCameraViewer *in_comp) { m_comp = in_comp; }
+
 private:
   bool m_draw;
+  creekCameraViewer *m_comp;
 };
 
 

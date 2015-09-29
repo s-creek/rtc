@@ -162,6 +162,88 @@ void OpenHRP::_objref_creekCameraViewerService::setDraw()
 
 
 }
+// Proxy call descriptor class. Mangled signature:
+//  void_i_cstring
+class _0RL_cd_99b784f75408b1c4_20000000
+  : public omniCallDescriptor
+{
+public:
+  inline _0RL_cd_99b784f75408b1c4_20000000(LocalCallFn lcfn,const char* op_,size_t oplen,_CORBA_Boolean upcall=0):
+     omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
+  {
+    
+  }
+  
+  void marshalArguments(cdrStream&);
+  void unmarshalArguments(cdrStream&);
+
+    
+  
+  static const char* const _user_exns[];
+
+  ::CORBA::String_var arg_0_;
+  const char* arg_0;
+};
+
+void _0RL_cd_99b784f75408b1c4_20000000::marshalArguments(cdrStream& _n)
+{
+  _n.marshalString(arg_0,0);
+
+}
+
+void _0RL_cd_99b784f75408b1c4_20000000::unmarshalArguments(cdrStream& _n)
+{
+  arg_0_ = _n.unmarshalString(0);
+  arg_0 = arg_0_.in();
+
+}
+
+const char* const _0RL_cd_99b784f75408b1c4_20000000::_user_exns[] = {
+  0
+};
+
+// Local call call-back function.
+static void
+_0RL_lcfn_99b784f75408b1c4_30000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_99b784f75408b1c4_20000000* tcd = (_0RL_cd_99b784f75408b1c4_20000000*)cd;
+  OpenHRP::_impl_creekCameraViewerService* impl = (OpenHRP::_impl_creekCameraViewerService*) svnt->_ptrToInterface(OpenHRP::creekCameraViewerService::_PD_repoId);
+  impl->setSearchFlag(tcd->arg_0);
+
+
+}
+
+void OpenHRP::_objref_creekCameraViewerService::setSearchFlag(const char* list)
+{
+  _0RL_cd_99b784f75408b1c4_20000000 _call_desc(_0RL_lcfn_99b784f75408b1c4_30000000, "setSearchFlag", 14);
+  _call_desc.arg_0 = list;
+
+  _invoke(_call_desc);
+
+
+
+}
+// Local call call-back function.
+static void
+_0RL_lcfn_99b784f75408b1c4_40000000(omniCallDescriptor*, omniServant* svnt)
+{
+  
+  OpenHRP::_impl_creekCameraViewerService* impl = (OpenHRP::_impl_creekCameraViewerService*) svnt->_ptrToInterface(OpenHRP::creekCameraViewerService::_PD_repoId);
+  impl->show();
+
+
+}
+
+void OpenHRP::_objref_creekCameraViewerService::show()
+{
+  _0RL_cd_99b784f75408b1c4_00000000 _call_desc(_0RL_lcfn_99b784f75408b1c4_40000000, "show", 5);
+
+
+  _invoke(_call_desc);
+
+
+
+}
 OpenHRP::_pof_creekCameraViewerService::~_pof_creekCameraViewerService() {}
 
 
@@ -194,6 +276,22 @@ OpenHRP::_impl_creekCameraViewerService::_dispatch(omniCallHandle& _handle)
   if( omni::strMatch(op, "setDraw") ) {
 
     _0RL_cd_99b784f75408b1c4_00000000 _call_desc(_0RL_lcfn_99b784f75408b1c4_10000000, "setDraw", 8, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if( omni::strMatch(op, "setSearchFlag") ) {
+
+    _0RL_cd_99b784f75408b1c4_20000000 _call_desc(_0RL_lcfn_99b784f75408b1c4_30000000, "setSearchFlag", 14, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if( omni::strMatch(op, "show") ) {
+
+    _0RL_cd_99b784f75408b1c4_00000000 _call_desc(_0RL_lcfn_99b784f75408b1c4_40000000, "show", 5, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
