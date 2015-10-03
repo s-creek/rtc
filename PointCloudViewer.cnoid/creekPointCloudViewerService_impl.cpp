@@ -53,3 +53,18 @@ void creekPointCloudViewerService_impl::changeMode()
   if( m_comp != NULL )
     m_comp->changeMode();
 }
+
+
+bool creekPointCloudViewerService_impl::autoFittinSwitch()
+{
+  if( m_comp != NULL )
+    m_comp->autoFittinSwitch();
+}
+
+
+void creekPointCloudViewerService_impl::clear()
+{
+  if( m_comp != NULL )
+    m_comp->clear();
+}
+

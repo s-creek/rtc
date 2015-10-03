@@ -14,5 +14,7 @@ module OpenHRP
     void test();
 
     void changeMode();
+    boolean autoFittinSwitch();
+    void clear();
   };
 };

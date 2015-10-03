@@ -405,6 +405,86 @@ void OpenHRP::_objref_creekPointCloudViewerService::changeMode()
 
 
 }
+// Proxy call descriptor class. Mangled signature:
+//  _cboolean
+class _0RL_cd_b22f7375262a75a3_90000000
+  : public omniCallDescriptor
+{
+public:
+  inline _0RL_cd_b22f7375262a75a3_90000000(LocalCallFn lcfn,const char* op_,size_t oplen,_CORBA_Boolean upcall=0):
+     omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
+  {
+    
+  }
+  
+  
+  void unmarshalReturnedValues(cdrStream&);
+  void marshalReturnedValues(cdrStream&);
+  
+  
+  static const char* const _user_exns[];
+
+  ::CORBA::Boolean result;
+};
+
+void _0RL_cd_b22f7375262a75a3_90000000::marshalReturnedValues(cdrStream& _n)
+{
+  _n.marshalBoolean(result);
+
+}
+
+void _0RL_cd_b22f7375262a75a3_90000000::unmarshalReturnedValues(cdrStream& _n)
+{
+  result = _n.unmarshalBoolean();
+
+}
+
+const char* const _0RL_cd_b22f7375262a75a3_90000000::_user_exns[] = {
+  0
+};
+
+// Local call call-back function.
+static void
+_0RL_lcfn_b22f7375262a75a3_a0000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_b22f7375262a75a3_90000000* tcd = (_0RL_cd_b22f7375262a75a3_90000000*)cd;
+  OpenHRP::_impl_creekPointCloudViewerService* impl = (OpenHRP::_impl_creekPointCloudViewerService*) svnt->_ptrToInterface(OpenHRP::creekPointCloudViewerService::_PD_repoId);
+  tcd->result = impl->autoFittinSwitch();
+
+
+}
+
+::CORBA::Boolean OpenHRP::_objref_creekPointCloudViewerService::autoFittinSwitch()
+{
+  _0RL_cd_b22f7375262a75a3_90000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_a0000000, "autoFittinSwitch", 17);
+
+
+  _invoke(_call_desc);
+  return _call_desc.result;
+
+
+}
+// Local call call-back function.
+static void
+_0RL_lcfn_b22f7375262a75a3_b0000000(omniCallDescriptor*, omniServant* svnt)
+{
+  
+  OpenHRP::_impl_creekPointCloudViewerService* impl = (OpenHRP::_impl_creekPointCloudViewerService*) svnt->_ptrToInterface(OpenHRP::creekPointCloudViewerService::_PD_repoId);
+  impl->clear();
+
+
+}
+
+void OpenHRP::_objref_creekPointCloudViewerService::clear()
+{
+  _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_b0000000, "clear", 6);
+
+
+  _invoke(_call_desc);
+
+
+
+}
 OpenHRP::_pof_creekPointCloudViewerService::~_pof_creekPointCloudViewerService() {}
 
 
@@ -477,6 +557,22 @@ OpenHRP::_impl_creekPointCloudViewerService::_dispatch(omniCallHandle& _handle)
   if( omni::strMatch(op, "changeMode") ) {
 
     _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_80000000, "changeMode", 11, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if( omni::strMatch(op, "autoFittinSwitch") ) {
+
+    _0RL_cd_b22f7375262a75a3_90000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_a0000000, "autoFittinSwitch", 17, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if( omni::strMatch(op, "clear") ) {
+
+    _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_b0000000, "clear", 6, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;

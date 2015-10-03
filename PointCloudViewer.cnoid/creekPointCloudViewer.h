@@ -51,6 +51,10 @@ public:
   void setModelToCurrent();
   void setModelToReference();
 
+  bool autoFittinSwitch();
+  void clear();
+
+
 protected:
   RTC::RangeData m_ranger;
   RTC::InPort<RTC::RangeData> m_rangerIn;
@@ -107,7 +111,7 @@ private:
 
   double m_samplingSize, m_planeThreshold, m_octSearchSize;
 
-  bool m_detectMode;
+  bool m_detectMode, m_autoFitting;
 };
 
 

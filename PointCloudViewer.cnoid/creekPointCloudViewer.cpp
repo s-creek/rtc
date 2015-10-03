@@ -219,6 +219,7 @@ RTC::ReturnCode_t creekPointCloudViewer::onActivated(RTC::UniqueId ec_id)
 
 
   m_detectMode = false;
+  m_autoFitting = true;
   return RTC::RTC_OK;
 }
 
@@ -541,22 +542,23 @@ bool creekPointCloudViewer::detectLandingPoint(double x, double y, double w, int
   double rp = acos( ez.dot(landN) );
   landR = Eigen::AngleAxisd(w, cnoid::Vector3::UnitZ()) * Eigen::AngleAxisd(rp, axis);
 
-
-  if( fittingFootPosition(plane_indices, landP, landR, ft, 10) ) {
-    std::cout << "creekPointCloudViewer : fitting foot position" << std::endl;
-  }
-  else if( false ) {  // simple mode
-    Eigen::Vector4f center; 
-    pcl::compute3DCentroid(*area, inliers->indices, center);
-    cnoid::Vector3 dist(center[0]-x, center[1]-y, center[2]-z);
-    if( dist.norm() > minRange ) {
-      dist *= ( minRange/dist.norm() );
+  if( m_autoFitting ) {
+    if( fittingFootPosition(plane_indices, landP, landR, ft, 10) ) {
+      std::cout << "creekPointCloudViewer : fitting foot position" << std::endl;
     }
-    landP += dist;
-    std::cout << "creekPointCloudViewer : move landing point,  move = " 
-	      << dist.format(Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]")) << std::endl;
+    else if( false ) {  // simple mode
+      Eigen::Vector4f center; 
+      pcl::compute3DCentroid(*area, inliers->indices, center);
+      cnoid::Vector3 dist(center[0]-x, center[1]-y, center[2]-z);
+      if( dist.norm() > minRange ) {
+	dist *= ( minRange/dist.norm() );
+      }
+      landP += dist;
+      std::cout << "creekPointCloudViewer : move landing point,  move = " 
+		<< dist.format(Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]")) << std::endl;
+    }
   }
-  
+
 
   // calc model position and orientation
   cnoid::Vector3 pos(landP);
@@ -812,6 +814,8 @@ void creekPointCloudViewer::updateMap()
     filter.setLeafSize (m_samplingSize, m_samplingSize, m_samplingSize);
     filter.filter(*m_world);
 
+    m_world->width  = m_world->size();
+    m_world->height = 1;
 
     m_viewer->updatePointCloud(m_cloud, "cloud");
     m_viewer->updatePointCloud(m_world, "world");
@@ -910,6 +914,26 @@ void creekPointCloudViewer::changeMode()
   }
 }
 
+
+bool creekPointCloudViewer::autoFittinSwitch()
+{
+  m_autoFitting = !m_autoFitting;
+
+  if( m_autoFitting )
+    std::cout << "creekPointCloudViewer : auto fitting ON" << std::endl;
+  else
+    std::cout << "creekPointCloudViewer : auto fitting OFF" << std::endl;
+
+  return m_autoFitting;
+}
+
+
+void creekPointCloudViewer::clear()
+{
+  m_world->clear();
+  m_world->width  = 0;
+  m_world->height = 0;
+}
 
 extern "C"
 {
