@@ -452,13 +452,35 @@ _0RL_lcfn_80d7548870faf0f8_a0000000(omniCallDescriptor* cd, omniServant* svnt)
 
 
 }
+// Local call call-back function.
+static void
+_0RL_lcfn_80d7548870faf0f8_b0000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_80d7548870faf0f8_20000000* tcd = (_0RL_cd_80d7548870faf0f8_20000000*)cd;
+  OpenHRP::_impl_creekSequencePlayerService* impl = (OpenHRP::_impl_creekSequencePlayerService*) svnt->_ptrToInterface(OpenHRP::creekSequencePlayerService::_PD_repoId);
+  tcd->result = impl->setBasePosRel(*tcd->arg_0, tcd->arg_1);
+
+
+}
+
+::CORBA::Boolean OpenHRP::_objref_creekSequencePlayerService::setBasePosRel(const ::OpenHRP::dSequence& pos, ::CORBA::Double tm)
+{
+  _0RL_cd_80d7548870faf0f8_20000000 _call_desc(_0RL_lcfn_80d7548870faf0f8_b0000000, "setBasePosRel", 14);
+  _call_desc.arg_0 = &(::OpenHRP::dSequence&) pos;
+  _call_desc.arg_1 = tm;
+
+  _invoke(_call_desc);
+  return _call_desc.result;
+
+
+}
 // Proxy call descriptor class. Mangled signature:
 //  void_i_clong
-class _0RL_cd_80d7548870faf0f8_b0000000
+class _0RL_cd_80d7548870faf0f8_c0000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_80d7548870faf0f8_b0000000(LocalCallFn lcfn,const char* op_,size_t oplen,_CORBA_Boolean upcall=0):
+  inline _0RL_cd_80d7548870faf0f8_c0000000(LocalCallFn lcfn,const char* op_,size_t oplen,_CORBA_Boolean upcall=0):
      omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -474,27 +496,27 @@ public:
   ::CORBA::Long arg_0;
 };
 
-void _0RL_cd_80d7548870faf0f8_b0000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_80d7548870faf0f8_c0000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
 
 }
 
-void _0RL_cd_80d7548870faf0f8_b0000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_80d7548870faf0f8_c0000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
 
 }
 
-const char* const _0RL_cd_80d7548870faf0f8_b0000000::_user_exns[] = {
+const char* const _0RL_cd_80d7548870faf0f8_c0000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_80d7548870faf0f8_c0000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_80d7548870faf0f8_d0000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_80d7548870faf0f8_b0000000* tcd = (_0RL_cd_80d7548870faf0f8_b0000000*)cd;
+  _0RL_cd_80d7548870faf0f8_c0000000* tcd = (_0RL_cd_80d7548870faf0f8_c0000000*)cd;
   OpenHRP::_impl_creekSequencePlayerService* impl = (OpenHRP::_impl_creekSequencePlayerService*) svnt->_ptrToInterface(OpenHRP::creekSequencePlayerService::_PD_repoId);
   impl->jointCalib(tcd->arg_0);
 
@@ -503,7 +525,7 @@ _0RL_lcfn_80d7548870faf0f8_c0000000(omniCallDescriptor* cd, omniServant* svnt)
 
 void OpenHRP::_objref_creekSequencePlayerService::jointCalib(::CORBA::Long scale)
 {
-  _0RL_cd_80d7548870faf0f8_b0000000 _call_desc(_0RL_lcfn_80d7548870faf0f8_c0000000, "jointCalib", 11);
+  _0RL_cd_80d7548870faf0f8_c0000000 _call_desc(_0RL_lcfn_80d7548870faf0f8_d0000000, "jointCalib", 11);
   _call_desc.arg_0 = scale;
 
   _invoke(_call_desc);
@@ -596,9 +618,17 @@ OpenHRP::_impl_creekSequencePlayerService::_dispatch(omniCallHandle& _handle)
     return 1;
   }
 
+  if( omni::strMatch(op, "setBasePosRel") ) {
+
+    _0RL_cd_80d7548870faf0f8_20000000 _call_desc(_0RL_lcfn_80d7548870faf0f8_b0000000, "setBasePosRel", 14, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
   if( omni::strMatch(op, "jointCalib") ) {
 
-    _0RL_cd_80d7548870faf0f8_b0000000 _call_desc(_0RL_lcfn_80d7548870faf0f8_c0000000, "jointCalib", 11, 1);
+    _0RL_cd_80d7548870faf0f8_c0000000 _call_desc(_0RL_lcfn_80d7548870faf0f8_d0000000, "jointCalib", 11, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;

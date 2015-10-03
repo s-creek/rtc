@@ -15,6 +15,7 @@
 #include "creekSequencePlayerService_impl.h"
 
 #include <cnoid/Body>
+#include <cnoid/JointPath>
 #include "VectorConvert.h"
 
 #include <creekInterpolator/Interpolator.h>
@@ -41,6 +42,8 @@ public:
   bool setBaseRpy(const double *rpy, double tm);
   bool setZmp(const double *zmp, double tm);
   bool isEmpty();
+
+  bool setBasePosRel(const double *pos, double tm);
 
   void jointCalib(int scale);
 
@@ -89,6 +92,8 @@ private:
 
   bool m_waitFlag;
   boost::interprocess::interprocess_semaphore m_waitSem;
+
+  cnoid::JointPathPtr m_rleg, m_lleg;
 
   void calcCoM();
 };

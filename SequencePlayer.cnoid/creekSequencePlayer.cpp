@@ -5,7 +5,8 @@
 
 #include <cnoid/BodyLoader>
 #include <cnoid/Link>
-
+#include <cnoid/JointPath>
+#include <cnoid/EigenUtil>
 
 static const char* creeksequenceplayer_spec[] =
   {
@@ -23,6 +24,9 @@ static const char* creeksequenceplayer_spec[] =
     // Configuration variables
     ""
   };
+
+
+Eigen::IOFormat iovec(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]");
 
 
 creekSequencePlayer::creekSequencePlayer(RTC::Manager* manager)
@@ -83,6 +87,9 @@ RTC::ReturnCode_t creekSequencePlayer::onInitialize()
   cnoid::BodyLoader bl;
   m_robot=bl.load( prop["model"].c_str() );
   m_dof = m_robot->numJoints();
+
+  m_rleg = cnoid::getCustomJointPath(m_robot, m_robot->rootLink(), m_robot->link(prop["RLEG_END"]) );
+  m_lleg = cnoid::getCustomJointPath(m_robot, m_robot->link(prop["LLEG_END"]), m_robot->rootLink() );
 
 
   //
@@ -233,8 +240,43 @@ bool creekSequencePlayer::setJointAngles(const double *angles, double tm)
 {
   if( m_qInit.data.length() != m_dof ) return false;
 
-  if( m_seq[ANGLES]->empty() ) {
-    return m_seq[ANGLES]->calcInterpolation(m_qInit.data.get_buffer(), angles, tm);
+  // if( m_seq[ANGLES]->empty() ) {
+  //   return m_seq[ANGLES]->calcInterpolation(m_qInit.data.get_buffer(), angles, tm);
+  // }
+  // else
+  //   return false;
+
+
+  if( m_seq[POS]->empty() && m_seq[ANGLES]->empty() && m_seq[ZMP]->empty() ) {
+    // get initial data
+    cnoid::Vector3 zmpInitRel(m_zmpRefInit.data.x, m_zmpRefInit.data.y, m_zmpRefInit.data.z);
+    cnoid::Vector3 posInit(m_basePosInit.data.x, m_basePosInit.data.y, m_basePosInit.data.z);
+    cnoid::Matrix3 rotInit( cnoid::rotFromRpy(m_baseRpyInit.data.r, m_baseRpyInit.data.p, m_baseRpyInit.data.y) );
+    cnoid::Vector3 zmpInitAbs(posInit + rotInit * zmpInitRel);
+
+
+    // set current model
+    m_robot->rootLink()->p() = posInit;
+    m_robot->rootLink()->R() = rotInit;
+    for(unsigned int i=0; i<m_dof; i++)
+      m_robot->joint(i)->q() = m_qInit.data[i];
+    m_robot->calcForwardKinematics();
+
+
+    // calc reference model
+    for(unsigned int i=0; i<m_dof; i++)
+      m_robot->joint(i)->q() = angles[i];
+    m_lleg->calcForwardKinematics();
+    m_robot->calcForwardKinematics();
+   
+    cnoid::Vector3 zmpRefRel( m_robot->rootLink()->R().transpose() * (zmpInitAbs-m_robot->rootLink()->p()) );
+    
+    m_seq[ANGLES]->calcInterpolation(m_qInit.data.get_buffer(), angles, tm);
+    m_seq[POS]->calcInterpolation(posInit.data(), m_robot->rootLink()->p().data(), tm);
+    m_seq[ZMP]->calcInterpolation(zmpInitRel.data(), zmpRefRel.data(), tm);
+
+    std::cout << "seq : ref base pos = " << m_robot->rootLink()->p().format(iovec) << std::endl;
+    return true;
   }
   else
     return false;
@@ -262,13 +304,64 @@ bool creekSequencePlayer::setJointAngle(const char* jname, double jv, double tm)
 
 bool creekSequencePlayer::setBasePos(const double *pos, double tm)
 {
-  if( !m_seq[POS]->empty() ) 
-    return false;
-  else {
+  // if( !m_seq[POS]->empty() ) 
+  //   return false;
+  // else {
+  //   cnoid::Vector3 posInit(m_basePosInit.data.x, m_basePosInit.data.y, m_basePosInit.data.z);
+  //   //std::cout << "creekSequencePlayer : init pos = " << posInit[0] << ", " << posInit[1] << ", " << posInit[2] << std::endl;
+  //   return m_seq[POS]->calcInterpolation(posInit.data(), pos, tm);
+  // }
+
+
+  if( m_seq[POS]->empty() && m_seq[ANGLES]->empty() && m_seq[ZMP]->empty() ) {
+    // get initial data
+    cnoid::Vector3 zmpInitRel(m_zmpRefInit.data.x, m_zmpRefInit.data.y, m_zmpRefInit.data.z);
     cnoid::Vector3 posInit(m_basePosInit.data.x, m_basePosInit.data.y, m_basePosInit.data.z);
-    //std::cout << "creekSequencePlayer : init pos = " << posInit[0] << ", " << posInit[1] << ", " << posInit[2] << std::endl;
-    return m_seq[POS]->calcInterpolation(posInit.data(), pos, tm);
+    cnoid::Matrix3 rotInit( cnoid::rotFromRpy(m_baseRpyInit.data.r, m_baseRpyInit.data.p, m_baseRpyInit.data.y) );
+    cnoid::Vector3 zmpInitAbs(posInit + rotInit * zmpInitRel);
+
+
+    // set current model
+    m_robot->rootLink()->p() = posInit;
+    m_robot->rootLink()->R() = rotInit;
+    for(unsigned int i=0; i<m_dof; i++)
+      m_robot->joint(i)->q() = m_qInit.data[i];
+    m_robot->calcForwardKinematics();
+
+
+    // calc reference model
+    cnoid::Vector3 posw(pos[0], pos[1], pos[2]);
+    cnoid::Position posr = m_rleg->endLink()->position();
+    bool update(false);
+    if( m_lleg->calcInverseKinematics( posw, rotInit) ) {
+       m_robot->calcForwardKinematics();
+       if( m_rleg->calcInverseKinematics(posr.translation(), posr.linear()) )
+	 update = true;
+    }
+    
+
+    if( update ) {
+      double qref[m_dof];
+      for(int i=0; i<m_dof; i++)
+	qref[i] = m_robot->joint(i)->q();
+
+      cnoid::Vector3 zmpRefRel( m_robot->rootLink()->R().transpose() * (zmpInitAbs-m_robot->rootLink()->p()) );
+      
+      m_seq[ANGLES]->calcInterpolation(m_qInit.data.get_buffer(), &qref[0], tm);
+      m_seq[POS]->calcInterpolation(posInit.data(), pos, tm);
+      m_seq[ZMP]->calcInterpolation(zmpInitRel.data(), zmpRefRel.data(), tm);
+    }
+    else {
+      m_robot->rootLink()->p() = posInit;
+      m_robot->rootLink()->R() = rotInit;
+      for(unsigned int i=0; i<m_dof; i++)
+	m_robot->joint(i)->q() = m_qInit.data[i];
+      m_robot->calcForwardKinematics();
+    }
+    return update;
   }
+  else
+    return false;
 }
 
 
@@ -379,6 +472,15 @@ void creekSequencePlayer::jointCalib(int scale)
     setJointAngle(name.c_str(), 0, std::fabs(time));
     waitInterpolation();
   }
+}
+
+
+bool creekSequencePlayer::setBasePosRel(const double *pos, double tm)
+{
+  cnoid::Vector3 posInit(m_basePosInit.data.x, m_basePosInit.data.y, m_basePosInit.data.z);
+  cnoid::Matrix3 rotInit( cnoid::rotFromRpy(m_baseRpyInit.data.r, m_baseRpyInit.data.p, m_baseRpyInit.data.y) );
+  cnoid::Vector3 refPos(posInit + rotInit * cnoid::Vector3(pos[0], pos[1], pos[2]) );
+  return setBasePos(refPos.data(), tm);
 }
 
 

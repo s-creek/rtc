@@ -24,6 +24,8 @@ public:
   ::CORBA::Boolean isEmpty();
   void jointCalib(int scale);
 
+  ::CORBA::Boolean setBasePosRel(const OpenHRP::dSequence& pos, ::CORBA::Double tm);
+
   void setComponent (creekSequencePlayer * i_comp) {
     m_comp = i_comp;
   }

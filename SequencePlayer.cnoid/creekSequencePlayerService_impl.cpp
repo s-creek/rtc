@@ -67,6 +67,12 @@ void creekSequencePlayerService_impl::jointCalib(int scale)
 }
 
 
+::CORBA::Boolean creekSequencePlayerService_impl::setBasePosRel(const OpenHRP::dSequence& pos, ::CORBA::Double tm)
+{
+  if( pos.length() != 3 ) return false;
+  return m_comp->setBasePosRel(pos.get_buffer(), tm);
+}
+
 // End of example implementational code
 
 
