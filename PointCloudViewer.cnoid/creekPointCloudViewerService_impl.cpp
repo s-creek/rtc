@@ -46,3 +46,10 @@ void creekPointCloudViewerService_impl::test()
   if( m_comp != NULL )
     m_comp->test();
 }
+
+
+void creekPointCloudViewerService_impl::changeMode()
+{
+  if( m_comp != NULL )
+    m_comp->changeMode();
+}

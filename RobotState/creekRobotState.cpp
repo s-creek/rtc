@@ -96,8 +96,8 @@ RTC::ReturnCode_t creekRobotState::onActivated(RTC::UniqueId ec_id)
   std::cout << "creekRobotState : onActivated" << std::endl;
 
   m_basePose.data.position.x =  0.0;
-  m_basePose.data.position.y = -1.0;
-  m_basePose.data.position.z =  1.5;
+  m_basePose.data.position.y =  0.0;
+  m_basePose.data.position.z =  0.0;
 
   m_basePose.data.orientation.r = 0.0;
   m_basePose.data.orientation.p = 0.0;
@@ -121,8 +121,8 @@ RTC::ReturnCode_t creekRobotState::onExecute(RTC::UniqueId ec_id)
     m_baseRpyIn.read();
 
     m_basePose.data.position.x =  0.0;
-    m_basePose.data.position.y = -1.0;
-    m_basePose.data.position.z =  1.5;
+    m_basePose.data.position.y =  0.0;
+    m_basePose.data.position.z =  0.0;
 
     m_basePose.data.orientation.r = m_baseRpy.data.r;
     m_basePose.data.orientation.p = m_baseRpy.data.p;
@@ -139,7 +139,6 @@ RTC::ReturnCode_t creekRobotState::onExecute(RTC::UniqueId ec_id)
     m_robot->rootLink()->p() << m_basePos.data.x, m_basePos.data.y, m_basePos.data.z;
     m_robot->rootLink()->R() = cnoid::rotFromRpy(m_baseRpy.data.r, m_baseRpy.data.p, m_baseRpy.data.y);
     m_robot->calcForwardKinematics();
-
 
     for( int i=0; i<m_cameras.size(); i++) {
       cnoid::Vector3 p, rpy;

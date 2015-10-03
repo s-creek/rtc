@@ -35,6 +35,15 @@ void creekCameraViewerService_impl::show()
   if( m_comp )
     m_comp->show();
 }
+
+
+void creekCameraViewerService_impl::saveData(const char *path)
+{
+   if( m_comp )
+    m_comp->saveData(path);
+}
+
+
 // End of example implementational code
 
 

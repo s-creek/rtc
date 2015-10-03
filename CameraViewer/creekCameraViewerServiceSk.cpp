@@ -244,6 +244,27 @@ void OpenHRP::_objref_creekCameraViewerService::show()
 
 
 }
+// Local call call-back function.
+static void
+_0RL_lcfn_99b784f75408b1c4_50000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_99b784f75408b1c4_20000000* tcd = (_0RL_cd_99b784f75408b1c4_20000000*)cd;
+  OpenHRP::_impl_creekCameraViewerService* impl = (OpenHRP::_impl_creekCameraViewerService*) svnt->_ptrToInterface(OpenHRP::creekCameraViewerService::_PD_repoId);
+  impl->saveData(tcd->arg_0);
+
+
+}
+
+void OpenHRP::_objref_creekCameraViewerService::saveData(const char* path)
+{
+  _0RL_cd_99b784f75408b1c4_20000000 _call_desc(_0RL_lcfn_99b784f75408b1c4_50000000, "saveData", 9);
+  _call_desc.arg_0 = path;
+
+  _invoke(_call_desc);
+
+
+
+}
 OpenHRP::_pof_creekCameraViewerService::~_pof_creekCameraViewerService() {}
 
 
@@ -292,6 +313,14 @@ OpenHRP::_impl_creekCameraViewerService::_dispatch(omniCallHandle& _handle)
   if( omni::strMatch(op, "show") ) {
 
     _0RL_cd_99b784f75408b1c4_00000000 _call_desc(_0RL_lcfn_99b784f75408b1c4_40000000, "show", 5, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if( omni::strMatch(op, "saveData") ) {
+
+    _0RL_cd_99b784f75408b1c4_20000000 _call_desc(_0RL_lcfn_99b784f75408b1c4_50000000, "saveData", 9, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;

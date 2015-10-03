@@ -181,6 +181,8 @@ RTC::ReturnCode_t creekCameraViewer::onExecute(RTC::UniqueId ec_id)
 		qrdata.name2 = "";
 		m_qrDataSet[ symbol->get_data() ] = qrdata;
 
+		std::cout << m_ports[i]->name() << " find QrCode" << std::endl;
+
 		closeFlag = true;
 	      }
 	      else if( !qrDataIt->second.calc ) {
@@ -198,6 +200,12 @@ RTC::ReturnCode_t creekCameraViewer::onExecute(RTC::UniqueId ec_id)
 		  std::cout << "  data = " << qrDataIt->first << std::endl;
 		  std::cout << "  pos = " << qrposition.format(Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]")) << std::endl;
 		}
+		// std::cout << m_ports[i]->name() << " find QrCode" << std::endl;
+		// Eigen::IOFormat IO(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]");
+		// std::cout << qrDataIt->second.p1.format(IO) << std::endl;
+		// std::cout << qrDataIt->second.e1.format(IO) << std::endl;
+		// std::cout << cp.format(IO) << std::endl;
+		// std::cout << ce.format(IO) << std::endl << std::endl;
 	      }
 	    }
 	  }
@@ -371,6 +379,18 @@ void creekCameraViewer::show()
 	      << it->second.calc << ", " 
 	      << it->second.pos.format(Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ", ", "", "", "[", "]")) << std::endl;
   }
+}
+
+
+void creekCameraViewer::saveData(const char *path)
+{
+  std::ofstream ofs(path);
+  if( ofs ) {
+    for( std::map< std::string, QrCodeData >::iterator it = m_qrDataSet.begin(); it != m_qrDataSet.end(); it++ ) {
+      ofs << it->second.data << "," << it->second.pos(0) << "," << it->second.pos(1) << "," << it->second.pos(2) << std::endl;
+    }
+  }
+  ofs.close();
 }
 
 

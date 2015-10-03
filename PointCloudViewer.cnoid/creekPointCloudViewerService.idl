@@ -12,5 +12,7 @@ module OpenHRP
     void getLandingPoint(out double x, out double y, out double z, out double r, out double p, out double w, in long ft);
 
     void test();
+
+    void changeMode();
   };
 };

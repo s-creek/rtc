@@ -384,6 +384,27 @@ void OpenHRP::_objref_creekPointCloudViewerService::test()
 
 
 }
+// Local call call-back function.
+static void
+_0RL_lcfn_b22f7375262a75a3_80000000(omniCallDescriptor*, omniServant* svnt)
+{
+  
+  OpenHRP::_impl_creekPointCloudViewerService* impl = (OpenHRP::_impl_creekPointCloudViewerService*) svnt->_ptrToInterface(OpenHRP::creekPointCloudViewerService::_PD_repoId);
+  impl->changeMode();
+
+
+}
+
+void OpenHRP::_objref_creekPointCloudViewerService::changeMode()
+{
+  _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_80000000, "changeMode", 11);
+
+
+  _invoke(_call_desc);
+
+
+
+}
 OpenHRP::_pof_creekPointCloudViewerService::~_pof_creekPointCloudViewerService() {}
 
 
@@ -448,6 +469,14 @@ OpenHRP::_impl_creekPointCloudViewerService::_dispatch(omniCallHandle& _handle)
   if( omni::strMatch(op, "test") ) {
 
     _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_70000000, "test", 5, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if( omni::strMatch(op, "changeMode") ) {
+
+    _0RL_cd_b22f7375262a75a3_00000000 _call_desc(_0RL_lcfn_b22f7375262a75a3_80000000, "changeMode", 11, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;

@@ -67,5 +67,7 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb3 -fno-schedule-insns -fno-schedule-insns2 -fno-strict-aliasing")
 
 #install(TARGETS ${target}
-install(TARGETS ${comp_name} LIBRARY DESTINATION rtc CONFIGURATIONS)
-install(FILES bridgeRobotState.conf DESTINATION rtc)
+#install(TARGETS ${comp_name} LIBRARY DESTINATION rtc CONFIGURATIONS)
+install(TARGETS ${comp_name} LIBRARY DESTINATION lib CONFIGURATIONS)
+#install(FILES bridgeRobotState.conf DESTINATION rtc)
+install(FILES bridgeRobotState.conf DESTINATION etc)

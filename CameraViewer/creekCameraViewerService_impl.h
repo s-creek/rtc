@@ -20,6 +20,8 @@ public:
 
   void setSearchFlag(const char *list);
   void show();
+  void saveData(const char *path);
+
   inline void setComponent(creekCameraViewer *in_comp) { m_comp = in_comp; }
 
 private:

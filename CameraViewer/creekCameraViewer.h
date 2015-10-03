@@ -32,6 +32,7 @@ public:
 
   void setSearchFlag(std::string &list);
   void show();
+  void saveData(const char *path);
 
 
 protected:

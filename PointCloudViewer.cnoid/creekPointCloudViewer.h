@@ -47,6 +47,9 @@ public:
   void updateMap();
   void test();
 
+  void changeMode();
+  void setModelToCurrent();
+  void setModelToReference();
 
 protected:
   RTC::RangeData m_ranger;
@@ -67,6 +70,11 @@ protected:
   RTC::TimedOrientation3D                m_baseRpyIcp;
   RTC::OutPort<RTC::TimedOrientation3D>  m_baseRpyOut;
 
+  RTC::TimedFloatSeq m_axes;
+  RTC::InPort<RTC::TimedFloatSeq> m_axesIn;
+  RTC::TimedBooleanSeq m_buttons;
+  RTC::InPort<RTC::TimedBooleanSeq> m_buttonsIn;
+  
   RTC::CorbaPort m_creekPointCloudViewerServicePort;
   creekPointCloudViewerService_impl m_service0;
 
@@ -98,6 +106,8 @@ private:
   cnoid::Position m_rsole, m_lsole;
 
   double m_samplingSize, m_planeThreshold, m_octSearchSize;
+
+  bool m_detectMode;
 };
 
 
